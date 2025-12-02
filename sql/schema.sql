@@ -71,6 +71,17 @@ CREATE TABLE IF NOT EXISTS orders (
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
+-- messages
+CREATE TABLE IF NOT EXISTS messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  sender_id INT NOT NULL,
+  receiver_id INT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sender_id) REFERENCES users(id),
+  FOREIGN KEY (receiver_id) REFERENCES users(id)
+);
+
 -- Initial Admin User (password: admin123)
 -- Hash generated via BCrypt for 'admin123'
 INSERT INTO users (username, password_hash, full_name, role) 
