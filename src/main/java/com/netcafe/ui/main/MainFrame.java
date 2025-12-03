@@ -33,7 +33,7 @@ public class MainFrame extends JFrame {
         }
 
         if (user.getRole() == User.Role.ADMIN) {
-            add(new com.netcafe.ui.admin.AdminDashboardPanel(this::logout));
+            add(new com.netcafe.ui.admin.AdminDashboardPanel(this));
         } else {
             add(new UserPanel(user));
         }

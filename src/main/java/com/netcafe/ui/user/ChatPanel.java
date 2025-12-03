@@ -79,20 +79,25 @@ public class ChatPanel extends JPanel {
             worker.execute();
         };
 
-        btnSend.addActionListener(e -> {
-            String content = txtContent.getText();
+        Runnable sendMessage = () -> {
+            String content = txtContent.getText().trim();
             if (!content.isEmpty()) {
-                SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                txtContent.setText(""); // Clear immediately
+                txtContent.setEnabled(false); // Prevent double send
+                btnSend.setEnabled(false);
+
+                SwingWorker<Void, Boolean> worker = new SwingWorker<>() {
                     @Override
                     protected Void doInBackground() throws Exception {
                         // 1. Send User Message
                         messageService.sendMessage(user.getId(), 1, content);
+                        publish(true); // Signal that user message is sent
 
                         // 2. Check for AI Response
                         String aiResponse = aiService.getResponse(content);
                         if (aiResponse != null) {
-                            // Simulate a small delay for realism
-                            Thread.sleep(500);
+                            // Simulate thinking time (longer for realism)
+                            Thread.sleep(1000);
                             // Send AI response as Admin (ID 1)
                             messageService.sendMessage(1, user.getId(), "[AI] " + aiResponse);
                         }
@@ -100,17 +105,38 @@ public class ChatPanel extends JPanel {
                     }
 
                     @Override
+                    protected void process(List<Boolean> chunks) {
+                        // Refresh UI to show user's message immediately
+                        loadChat.run();
+                    }
+
+                    @Override
                     protected void done() {
                         try {
-                            get();
-                            loadChat.run();
-                            txtContent.setText("");
+                            get(); // Check for exceptions
                         } catch (Exception ex) {
                             SwingUtils.showError(ChatPanel.this, "Error sending message", ex);
+                        } finally {
+                            loadChat.run(); // Refresh to show AI message
+                            txtContent.setEnabled(true);
+                            btnSend.setEnabled(true);
+                            txtContent.requestFocus();
                         }
                     }
                 };
                 worker.execute();
+            }
+        };
+
+        btnSend.addActionListener(e -> sendMessage.run());
+
+        // Add KeyListener for Enter key
+        txtContent.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    sendMessage.run();
+                }
             }
         });
 
