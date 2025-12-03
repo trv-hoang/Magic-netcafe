@@ -25,14 +25,33 @@ public class SessionService {
             return active.get();
         }
 
-        // Check balance
+        // Check balance (Allow GOLD users to start with <= 0)
         Optional<Account> accOpt = accountDAO.findByUserId(userId);
-        if (accOpt.isEmpty() || accOpt.get().getBalance() <= 0) {
+        long balance = accOpt.map(Account::getBalance).orElse(0L);
+
+        // Get User Tier
+        com.netcafe.model.User user = new com.netcafe.dao.UserDAO().findById(DBPool.getConnection(), userId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        if (balance <= 0 && user.getTier() != com.netcafe.model.User.Tier.GOLD) {
             throw new Exception("Insufficient balance to start session.");
         }
 
-        long balance = accOpt.get().getBalance();
-        int secondsPurchased = (int) ((balance * 3600) / ratePerHour);
+        int secondsPurchased;
+        if (user.getTier() == com.netcafe.model.User.Tier.GOLD && balance <= 0) {
+            // Post-paid: Give them a "virtual" large amount of time (e.g., 24 hours) or
+            // handle differently
+            // For simplicity, let's give them 24 hours if balance is 0 or negative
+            secondsPurchased = 24 * 3600;
+        } else {
+            secondsPurchased = (int) ((balance * 3600) / ratePerHour);
+            // If GOLD user has some balance but runs out, they should switch to post-paid?
+            // Current logic: strict prepaid for non-GOLD.
+            // Let's add buffer for GOLD users?
+            if (user.getTier() == com.netcafe.model.User.Tier.GOLD) {
+                secondsPurchased += 24 * 3600; // Add 24h buffer
+            }
+        }
 
         Session session = new Session();
         session.setUserId(userId);
@@ -59,8 +78,10 @@ public class SessionService {
                 // 2. Lock account and update balance
                 Account account = accountDAO.getAccountForUpdate(conn, userId);
                 long newBalance = account.getBalance() - cost;
-                // Allow negative balance? Usually no, but let's assume we just deduct what was consumed.
+                // Allow negative balance? Usually no, but let's assume we just deduct what was
+                // consumed.
                 // Or we can clamp to 0 if prepaid. But logic says we deduct exact cost.
+                // For GOLD users, this will naturally go negative, which is fine.
                 accountDAO.updateBalance(conn, userId, newBalance);
 
                 // 3. Update session
@@ -73,7 +94,7 @@ public class SessionService {
             }
         }
     }
-    
+
     public Optional<Session> getActiveSession(int userId) throws SQLException {
         return sessionDAO.findActiveSessionByUserId(userId);
     }

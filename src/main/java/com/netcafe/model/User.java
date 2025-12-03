@@ -8,11 +8,16 @@ public class User {
     private String passwordHash;
     private String fullName;
     private Role role;
+    private Tier tier;
     private int points;
     private LocalDateTime createdAt;
 
     public enum Role {
         ADMIN, USER
+    }
+
+    public enum Tier {
+        BRONZE, SILVER, GOLD
     }
 
     public User() {
@@ -63,6 +68,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Tier getTier() {
+        return tier;
+    }
+
+    public void setTier(Tier tier) {
+        this.tier = tier;
     }
 
     public int getPoints() {

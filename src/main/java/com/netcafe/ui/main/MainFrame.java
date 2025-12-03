@@ -1,7 +1,7 @@
 package com.netcafe.ui.main;
 
 import com.netcafe.model.User;
-import com.netcafe.ui.admin.AdminPanel;
+
 import com.netcafe.ui.user.UserPanel;
 
 import javax.swing.*;
@@ -33,9 +33,10 @@ public class MainFrame extends JFrame {
         }
 
         if (user.getRole() == User.Role.ADMIN) {
-            add(new AdminPanel());
+            add(new com.netcafe.ui.admin.AdminDashboardPanel(this));
         } else {
             add(new UserPanel(user));
         }
     }
+
 }

@@ -69,7 +69,7 @@ public class LoginFrame extends JFrame {
         gbc.weightx = 1.0;
 
         // Welcome Text
-        JLabel lblWelcome = new JLabel("Welcome Back");
+        JLabel lblWelcome = new JLabel("Welcome Back!");
         lblWelcome.setFont(com.netcafe.ui.ThemeConfig.FONT_HEADER);
         lblWelcome.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
         gbc.gridy = 0;
@@ -152,7 +152,9 @@ public class LoginFrame extends JFrame {
                     // Auto-start session for USER role
                     if (user.getRole() == User.Role.USER) {
                         try {
-                            String machineName = java.net.InetAddress.getLocalHost().getHostName();
+                            // For testing/simulation, we force "PC-01"
+                            String machineName = "PC-01";
+                            // String machineName = java.net.InetAddress.getLocalHost().getHostName();
                             new com.netcafe.service.SessionService().startSession(user.getId(), machineName);
                         } catch (Exception e) {
                             // Ignore if session already active or other minor issues,

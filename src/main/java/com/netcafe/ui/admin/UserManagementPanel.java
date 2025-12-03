@@ -13,7 +13,7 @@ public class UserManagementPanel extends JPanel {
     private final UserService userService = new UserService();
     private final BillingService billingService = new BillingService();
     private final DefaultTableModel userModel = new DefaultTableModel(
-            new String[] { "ID", "Username", "Full Name", "Role", "Balance", "Points" }, 0);
+            new String[] { "ID", "Username", "Full Name", "Role", "Tier", "Balance", "Points" }, 0);
 
     public UserManagementPanel() {
         setLayout(new BorderLayout());
@@ -165,7 +165,7 @@ public class UserManagementPanel extends JPanel {
                         if (u.getRole() == role) {
                             long balance = balances.getOrDefault(u.getId(), 0L);
                             model.addRow(new Object[] { u.getId(), u.getUsername(), u.getFullName(), u.getRole(),
-                                    balance, u.getPoints() });
+                                    u.getTier(), balance, u.getPoints() });
                         }
                     }
                 } catch (Exception ex) {

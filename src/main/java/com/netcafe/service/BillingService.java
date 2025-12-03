@@ -26,6 +26,22 @@ public class BillingService {
         return (int) (amount / 1000);
     }
 
+    private com.netcafe.model.User.Tier calculateTier(int points) {
+        if (points >= 5000)
+            return com.netcafe.model.User.Tier.GOLD;
+        if (points >= 1000)
+            return com.netcafe.model.User.Tier.SILVER;
+        return com.netcafe.model.User.Tier.BRONZE;
+    }
+
+    private void updatePointsAndTier(Connection conn, int userId, int newPoints) throws Exception {
+        userDAO.updatePoints(conn, userId, newPoints);
+        com.netcafe.model.User.Tier newTier = calculateTier(newPoints);
+        // We could check if tier changed to avoid unnecessary updates, but SQL update
+        // is cheap enough here
+        userDAO.updateTier(conn, userId, newTier);
+    }
+
     public void requestTopup(int userId, long amount) throws Exception {
         TopupRequest request = new TopupRequest(userId, amount);
         topupRequestDAO.create(request);
@@ -67,7 +83,7 @@ public class BillingService {
                 if (pointsEarned > 0) {
                     com.netcafe.model.User user = userDAO.findById(conn, req.getUserId())
                             .orElseThrow(() -> new Exception("User not found"));
-                    userDAO.updatePoints(conn, req.getUserId(), user.getPoints() + pointsEarned);
+                    updatePointsAndTier(conn, req.getUserId(), user.getPoints() + pointsEarned);
                 }
 
                 conn.commit();
@@ -147,7 +163,7 @@ public class BillingService {
                 if (pointsEarned > 0) {
                     com.netcafe.model.User user = userDAO.findById(conn, userId)
                             .orElseThrow(() -> new Exception("User not found"));
-                    userDAO.updatePoints(conn, userId, user.getPoints() + pointsEarned);
+                    updatePointsAndTier(conn, userId, user.getPoints() + pointsEarned);
                 }
 
                 conn.commit();
@@ -205,7 +221,7 @@ public class BillingService {
                 }
 
                 // 2. Update Points
-                userDAO.updatePoints(conn, userId, user.getPoints() - pointsToRedeem);
+                updatePointsAndTier(conn, userId, user.getPoints() - pointsToRedeem);
 
                 // 3. Add Balance
                 try {
