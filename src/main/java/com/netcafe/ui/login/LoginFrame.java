@@ -69,7 +69,7 @@ public class LoginFrame extends JFrame {
         gbc.weightx = 1.0;
 
         // Welcome Text
-        JLabel lblWelcome = new JLabel("Welcome Back");
+        JLabel lblWelcome = new JLabel("Welcome Back!");
         lblWelcome.setFont(com.netcafe.ui.ThemeConfig.FONT_HEADER);
         lblWelcome.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
         gbc.gridy = 0;

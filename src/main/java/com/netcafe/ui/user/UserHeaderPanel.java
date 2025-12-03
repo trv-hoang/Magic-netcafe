@@ -20,6 +20,7 @@ public class UserHeaderPanel extends JPanel {
 
     private final JLabel lblBalance = new JLabel("Balance: Loading...");
     private final JLabel lblPoints = new JLabel("Points: --");
+    private final JLabel lblTier = new JLabel("Tier: --");
     private final JLabel lblTimeRemaining = new JLabel("Time Remaining: --:--:--");
     private final JLabel lblStatus = new JLabel("Status: IDLE");
 
@@ -61,7 +62,7 @@ public class UserHeaderPanel extends JPanel {
         add(leftPanel, BorderLayout.WEST);
 
         // Center: Balance & Time
-        JPanel centerPanel = new JPanel(new GridLayout(3, 1, 0, 2));
+        JPanel centerPanel = new JPanel(new GridLayout(4, 1, 0, 2));
         centerPanel.setBackground(ThemeConfig.BG_PANEL);
 
         lblBalance.setFont(ThemeConfig.FONT_SUBHEADER);
@@ -70,11 +71,15 @@ public class UserHeaderPanel extends JPanel {
         lblPoints.setFont(ThemeConfig.FONT_BODY_BOLD);
         lblPoints.setForeground(ThemeConfig.ACCENT);
 
+        lblTier.setFont(ThemeConfig.FONT_BODY_BOLD);
+        lblTier.setForeground(new Color(255, 215, 0)); // Gold color default
+
         lblTimeRemaining.setFont(ThemeConfig.FONT_MONO);
         lblTimeRemaining.setForeground(ThemeConfig.TEXT_PRIMARY);
 
         centerPanel.add(lblBalance);
         centerPanel.add(lblPoints);
+        centerPanel.add(lblTier);
         centerPanel.add(lblTimeRemaining);
         add(centerPanel, BorderLayout.CENTER);
 
@@ -137,6 +142,33 @@ public class UserHeaderPanel extends JPanel {
                             try {
                                 int points = get();
                                 lblPoints.setText("Points: " + points);
+
+                                // Update Tier Display
+                                com.netcafe.model.User.Tier tier = user.getTier();
+                                // We might need to refresh user from DB to get latest tier if it changed
+                                // For now, let's assume it's static or we fetch it.
+                                // Actually, points update might change tier, so we should ideally re-fetch
+                                // user.
+                                // But for simplicity, let's just use what we have or do a quick check.
+                                if (points >= 5000)
+                                    tier = com.netcafe.model.User.Tier.GOLD;
+                                else if (points >= 1000)
+                                    tier = com.netcafe.model.User.Tier.SILVER;
+                                else
+                                    tier = com.netcafe.model.User.Tier.BRONZE;
+
+                                lblTier.setText("Tier: " + tier);
+                                switch (tier) {
+                                    case GOLD:
+                                        lblTier.setForeground(new Color(255, 215, 0));
+                                        break;
+                                    case SILVER:
+                                        lblTier.setForeground(new Color(192, 192, 192));
+                                        break;
+                                    case BRONZE:
+                                        lblTier.setForeground(new Color(205, 127, 50));
+                                        break;
+                                }
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }

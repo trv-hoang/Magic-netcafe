@@ -31,12 +31,13 @@ public class UserDAO {
     }
 
     public User create(Connection conn, User user) throws SQLException {
-        String sql = "INSERT INTO users (username, password_hash, full_name, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, password_hash, full_name, role, tier) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getPasswordHash());
             stmt.setString(3, user.getFullName());
             stmt.setString(4, user.getRole().name());
+            stmt.setString(5, user.getTier().name());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -115,6 +116,15 @@ public class UserDAO {
         }
     }
 
+    public void updateTier(Connection conn, int userId, User.Tier newTier) throws SQLException {
+        String sql = "UPDATE users SET tier = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newTier.name());
+            stmt.setInt(2, userId);
+            stmt.executeUpdate();
+        }
+    }
+
     private User mapRow(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id"));
@@ -122,6 +132,7 @@ public class UserDAO {
         user.setPasswordHash(rs.getString("password_hash"));
         user.setFullName(rs.getString("full_name"));
         user.setRole(User.Role.valueOf(rs.getString("role")));
+        user.setTier(User.Tier.valueOf(rs.getString("tier")));
         user.setPoints(rs.getInt("points"));
         user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         return user;

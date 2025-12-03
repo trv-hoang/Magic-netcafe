@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255) NOT NULL,
   full_name VARCHAR(100),
   role ENUM('ADMIN','USER') DEFAULT 'USER',
+  tier ENUM('BRONZE','SILVER','GOLD') DEFAULT 'BRONZE',
   points INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -123,6 +124,7 @@ ON DUPLICATE KEY UPDATE price = VALUES(price);
 -- I will use a known hash for 'admin123' in the code or let the user create it.
 -- For now, I'll leave the insert commented out or use a placeholder that the user must change or I will provide a utility to generate it.
 -- Better: I'll provide a main method in PasswordUtil to generate hashes.
+
 -- computers
 CREATE TABLE IF NOT EXISTS computers (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -148,5 +150,5 @@ CREATE TABLE IF NOT EXISTS maintenance_requests (
 INSERT IGNORE INTO computers (name, status, x_pos, y_pos) VALUES
 ('PC-01', 'AVAILABLE', 0, 0), ('PC-02', 'AVAILABLE', 1, 0), ('PC-03', 'AVAILABLE', 2, 0), ('PC-04', 'AVAILABLE', 3, 0), ('PC-05', 'AVAILABLE', 4, 0),
 ('PC-06', 'AVAILABLE', 0, 1), ('PC-07', 'AVAILABLE', 1, 1), ('PC-08', 'AVAILABLE', 2, 1), ('PC-09', 'AVAILABLE', 3, 1), ('PC-10', 'AVAILABLE', 4, 1),
-('PC-11', 'AVAILABLE', 0, 2), ('PC-12', 'AVAILABLE', 1, 2), ('PC-13', 'AVAILABLE', 2, 2), ('PC-14', 'AVAILABLE', 3, 2), ('PC-15', 'AVAILABLE', 4, 2),
-('PC-16', 'AVAILABLE', 0, 3), ('PC-17', 'AVAILABLE', 1, 3), ('PC-18', 'AVAILABLE', 2, 3), ('PC-19', 'AVAILABLE', 3, 3), ('PC-20', 'AVAILABLE', 4, 3);
+('PC-11', 'AVAILABLE', 0, 3), ('PC-12', 'AVAILABLE', 1, 3), ('PC-13', 'AVAILABLE', 2, 3), ('PC-14', 'AVAILABLE', 3, 3), ('PC-15', 'AVAILABLE', 4, 3),
+('PC-16', 'AVAILABLE', 0, 4), ('PC-17', 'AVAILABLE', 1, 4), ('PC-18', 'AVAILABLE', 2, 4), ('PC-19', 'AVAILABLE', 3, 4), ('PC-20', 'AVAILABLE', 4, 4);

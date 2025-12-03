@@ -20,11 +20,15 @@ public class ComputerMapPanel extends JPanel {
     public ComputerMapPanel() {
         setLayout(new BorderLayout());
 
-        // 1. Map Area (Center)
-        mapPanel = new JPanel(new GridLayout(4, 5, 10, 10)); // 4 rows, 5 cols for 20 PCs
-        mapPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        mapPanel.setBackground(Color.WHITE);
-        add(new JScrollPane(mapPanel), BorderLayout.CENTER);
+        // Map Visualization (Center)
+        mapPanel = new JPanel(null); // Absolute positioning
+        mapPanel.setBackground(new Color(60, 63, 65)); // Dark floor color
+        mapPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        mapPanel.setPreferredSize(new Dimension(800, 600)); // Fixed size for scrolling
+
+        JScrollPane scrollPane = new JScrollPane(mapPanel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        add(scrollPane, BorderLayout.CENTER);
 
         // 2. Maintenance Requests (Right)
         requestPanel = new JPanel();
@@ -72,24 +76,15 @@ public class ComputerMapPanel extends JPanel {
         mapPanel.removeAll();
         for (Computer c : computers) {
             JButton btn = new JButton(c.getName());
-            btn.setPreferredSize(new Dimension(100, 80));
+            btn.setToolTipText("Status: " + c.getStatus());
             btn.setFont(ThemeConfig.FONT_BODY_BOLD);
 
-            switch (c.getStatus()) {
-                case AVAILABLE:
-                    btn.setBackground(ThemeConfig.SUCCESS);
-                    btn.setForeground(Color.WHITE);
-                    break;
-                case OCCUPIED:
-                    btn.setBackground(ThemeConfig.DANGER);
-                    btn.setForeground(Color.WHITE);
-                    break;
-                case MAINTENANCE:
-                case DIRTY:
-                    btn.setBackground(ThemeConfig.ACCENT);
-                    btn.setForeground(Color.WHITE);
-                    break;
-            }
+            // Calculate position (50px padding, 120px width spacing, 100px height spacing)
+            int x = 50 + c.getXPos() * 120;
+            int y = 50 + c.getYPos() * 100;
+            btn.setBounds(x, y, 100, 80);
+
+            updateButtonAppearance(btn, c.getStatus());
 
             // Context Menu
             JPopupMenu popup = new JPopupMenu();
@@ -103,11 +98,28 @@ public class ComputerMapPanel extends JPanel {
             popup.add(itemMaintenance);
 
             btn.setComponentPopupMenu(popup);
-
             mapPanel.add(btn);
         }
         mapPanel.revalidate();
         mapPanel.repaint();
+    }
+
+    private void updateButtonAppearance(JButton btn, Computer.Status status) {
+        switch (status) {
+            case AVAILABLE:
+                btn.setBackground(ThemeConfig.SUCCESS);
+                btn.setForeground(Color.WHITE);
+                break;
+            case OCCUPIED:
+                btn.setBackground(ThemeConfig.DANGER);
+                btn.setForeground(Color.WHITE);
+                break;
+            case MAINTENANCE:
+            case DIRTY:
+                btn.setBackground(ThemeConfig.ACCENT);
+                btn.setForeground(Color.WHITE);
+                break;
+        }
     }
 
     private void updateRequests(List<MaintenanceRequest> requests) {
