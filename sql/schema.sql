@@ -28,6 +28,15 @@ CREATE TABLE IF NOT EXISTS topups (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- computers
+CREATE TABLE IF NOT EXISTS computers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE,
+  status ENUM('AVAILABLE','OCCUPIED','MAINTENANCE','DIRTY') DEFAULT 'AVAILABLE',
+  x_pos INT DEFAULT 0,
+  y_pos INT DEFAULT 0
+);
+
 -- sessions
 CREATE TABLE IF NOT EXISTS sessions (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -126,14 +135,7 @@ ON DUPLICATE KEY UPDATE price = VALUES(price);
 -- For now, I'll leave the insert commented out or use a placeholder that the user must change or I will provide a utility to generate it.
 -- Better: I'll provide a main method in PasswordUtil to generate hashes.
 
--- computers
-CREATE TABLE IF NOT EXISTS computers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(50) NOT NULL UNIQUE,
-  status ENUM('AVAILABLE','OCCUPIED','MAINTENANCE','DIRTY') DEFAULT 'AVAILABLE',
-  x_pos INT DEFAULT 0,
-  y_pos INT DEFAULT 0
-);
+
 
 -- maintenance_requests
 CREATE TABLE IF NOT EXISTS maintenance_requests (
