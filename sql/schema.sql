@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS sessions (
   time_consumed_seconds INT DEFAULT 0,
   status ENUM('ACTIVE','ENDED') DEFAULT 'ACTIVE',
   machine_name VARCHAR(50),
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (machine_name) REFERENCES computers(name)
 );
 
 -- products

@@ -30,6 +30,19 @@ public class ComputerMapPanel extends JPanel {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         add(scrollPane, BorderLayout.CENTER);
 
+        // Add visual labels
+        JLabel lblEntrance = new JLabel("ENTRANCE", SwingConstants.CENTER);
+        lblEntrance.setFont(ThemeConfig.FONT_HEADER);
+        lblEntrance.setForeground(Color.LIGHT_GRAY);
+        lblEntrance.setBounds(300, 550, 200, 30);
+        mapPanel.add(lblEntrance);
+
+        JLabel lblWalkway = new JLabel("WALKWAY", SwingConstants.CENTER);
+        lblWalkway.setFont(ThemeConfig.FONT_BODY_BOLD);
+        lblWalkway.setForeground(Color.GRAY);
+        lblWalkway.setBounds(300, 280, 200, 30); // Between row 2 (y=1) and row 3 (y=3) -> y=2 approx
+        mapPanel.add(lblWalkway);
+
         // 2. Maintenance Requests (Right)
         requestPanel = new JPanel();
         requestPanel.setLayout(new BoxLayout(requestPanel, BoxLayout.Y_AXIS));
