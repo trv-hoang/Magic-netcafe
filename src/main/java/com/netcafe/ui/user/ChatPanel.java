@@ -13,6 +13,7 @@ import java.util.List;
 public class ChatPanel extends JPanel {
     private final User user;
     private final MessageService messageService = new MessageService();
+    private final com.netcafe.service.AIService aiService = new com.netcafe.service.AIService();
     private final JTextArea chatArea = new JTextArea();
     private Timer chatTimer;
 
@@ -84,7 +85,17 @@ public class ChatPanel extends JPanel {
                 SwingWorker<Void, Void> worker = new SwingWorker<>() {
                     @Override
                     protected Void doInBackground() throws Exception {
+                        // 1. Send User Message
                         messageService.sendMessage(user.getId(), 1, content);
+
+                        // 2. Check for AI Response
+                        String aiResponse = aiService.getResponse(content);
+                        if (aiResponse != null) {
+                            // Simulate a small delay for realism
+                            Thread.sleep(500);
+                            // Send AI response as Admin (ID 1)
+                            messageService.sendMessage(1, user.getId(), "[AI] " + aiResponse);
+                        }
                         return null;
                     }
 
