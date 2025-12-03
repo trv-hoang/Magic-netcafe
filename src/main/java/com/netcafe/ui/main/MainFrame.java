@@ -1,7 +1,7 @@
 package com.netcafe.ui.main;
 
 import com.netcafe.model.User;
-import com.netcafe.ui.admin.AdminPanel;
+
 import com.netcafe.ui.user.UserPanel;
 
 import javax.swing.*;
@@ -33,7 +33,14 @@ public class MainFrame extends JFrame {
         }
 
         if (user.getRole() == User.Role.ADMIN) {
-            add(new AdminPanel());
+            JTabbedPane adminTabs = new JTabbedPane();
+            adminTabs.addTab("Dashboard", new com.netcafe.ui.admin.DashboardPanel());
+            adminTabs.addTab("Order Management", new com.netcafe.ui.admin.OrderManagementPanel());
+            adminTabs.addTab("Topup Requests", new com.netcafe.ui.admin.TopupRequestPanel());
+            adminTabs.addTab("User Management", new com.netcafe.ui.admin.UserManagementPanel());
+            adminTabs.addTab("Computer Map", new com.netcafe.ui.admin.ComputerMapPanel());
+
+            add(adminTabs);
         } else {
             add(new UserPanel(user));
         }

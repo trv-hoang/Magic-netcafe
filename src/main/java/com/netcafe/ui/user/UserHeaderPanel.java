@@ -88,7 +88,22 @@ public class UserHeaderPanel extends JPanel {
         btnLogout.setFocusPainted(false);
         btnLogout.addActionListener(e -> logout());
 
-        add(btnLogout, BorderLayout.EAST);
+        JButton btnReport = new JButton("Report Issue");
+        btnReport.putClientProperty("JButton.buttonType", "roundRect");
+        btnReport.setBackground(ThemeConfig.ACCENT);
+        btnReport.setForeground(Color.WHITE);
+        btnReport.setFont(ThemeConfig.FONT_SMALL);
+        btnReport.setMargin(new Insets(4, 12, 4, 12));
+        btnReport.setFocusPainted(false);
+        btnReport.addActionListener(
+                e -> new ReportIssueDialog(SwingUtilities.getWindowAncestor(this), user).setVisible(true));
+
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rightPanel.setBackground(ThemeConfig.BG_PANEL);
+        rightPanel.add(btnReport);
+        rightPanel.add(btnLogout);
+
+        add(rightPanel, BorderLayout.EAST);
     }
 
     private void logout() {
