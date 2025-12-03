@@ -20,6 +20,12 @@ public class BillingService {
     private final TopupRequestDAO topupRequestDAO = new TopupRequestDAO();
     private final com.netcafe.dao.UserDAO userDAO = new com.netcafe.dao.UserDAO();
 
+    private static final String TOPUP_METHOD_ADMIN = "ADMIN_APPROVED";
+
+    private int calculatePoints(long amount) {
+        return (int) (amount / 1000);
+    }
+
     public void requestTopup(int userId, long amount) throws Exception {
         TopupRequest request = new TopupRequest(userId, amount);
         topupRequestDAO.create(request);
@@ -39,7 +45,8 @@ public class BillingService {
 
                 // 2. Perform Topup (Logic from original topup method)
                 // Create Topup Record
-                Topup topup = new Topup(req.getUserId(), req.getAmount(), "ADMIN_APPROVED");
+                // Create Topup Record
+                Topup topup = new Topup(req.getUserId(), req.getAmount(), TOPUP_METHOD_ADMIN);
                 topupDAO.create(conn, topup);
 
                 // Update Balance
@@ -55,7 +62,8 @@ public class BillingService {
                 topupRequestDAO.updateStatus(conn, requestId, TopupRequest.Status.APPROVED);
 
                 // 4. Award Points (1 Point per 1,000 VND)
-                int pointsEarned = (int) (req.getAmount() / 1000);
+                // 4. Award Points (1 Point per 1,000 VND)
+                int pointsEarned = calculatePoints(req.getAmount());
                 if (pointsEarned > 0) {
                     com.netcafe.model.User user = userDAO.findById(conn, req.getUserId())
                             .orElseThrow(() -> new Exception("User not found"));
@@ -134,7 +142,8 @@ public class BillingService {
                 orderDAO.create(conn, order);
 
                 // 4. Award Points (1 Point per 1,000 VND)
-                int pointsEarned = (int) (totalPrice / 1000);
+                // 4. Award Points (1 Point per 1,000 VND)
+                int pointsEarned = calculatePoints(totalPrice);
                 if (pointsEarned > 0) {
                     com.netcafe.model.User user = userDAO.findById(conn, userId)
                             .orElseThrow(() -> new Exception("User not found"));

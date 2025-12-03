@@ -19,3 +19,15 @@ EXISTING IMAGES:
 - CocaCola.jpg
 - Com Rang.jpg
 - My Trung.jpg
+
+IMAGE SPECIFICATIONS:
+=====================
+For the best product preview experience, please use images with the following specifications:
+
+- **Target Display Size**: 150px (Width) x 110px (Height)
+- **Container Size**: 180px x 120px
+- **Recommended Aspect Ratio**: ~4:3 (1.36:1)
+- **Recommended Resolution**: 300x220 pixels or 600x440 pixels (for high quality)
+
+The application will automatically scale images to fit within the 150x110 area while preserving the aspect ratio.
+

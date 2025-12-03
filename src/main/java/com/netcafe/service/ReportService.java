@@ -2,12 +2,10 @@ package com.netcafe.service;
 
 import com.netcafe.dao.OrderDAO;
 import com.netcafe.dao.TopupDAO;
-import com.netcafe.model.Order;
-import com.netcafe.model.Topup;
 
 import java.time.YearMonth;
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 
 public class ReportService {
@@ -16,49 +14,29 @@ public class ReportService {
 
     public Map<YearMonth, Long> getMonthlyRevenue() throws Exception {
         Map<YearMonth, Long> revenueMap = new HashMap<>();
-        // For simplicity in this demo, we will just fetch for the current month and
-        // maybe a few past ones if we iterated.
-        // But since the chart needs a Map, let's keep the existing logic of fetching
-        // ALL and aggregating in memory
-        // OR we can optimize. For now, let's use the new DAO methods for specific
-        // months if we were building a specific report.
-        // However, to populate a full chart, fetching all is easier for a small app.
-        // Let's stick to the previous logic but maybe clean it up or use the new
-        // methods if we want to query specific ranges.
-        // Actually, the previous logic was fine for a small dataset.
-        // Let's ADD the new methods for the Dashboard "Snapshot".
 
-        // Re-implementing getMonthlyRevenue to be consistent with "Topups + Orders"
-        // logic
-        List<Topup> topups = topupDAO.findAll();
-        for (Topup t : topups) {
-            YearMonth ym = YearMonth.from(t.getCreatedAt());
-            revenueMap.merge(ym, t.getAmount(), Long::sum);
-        }
-        List<Order> orders = orderDAO.findAll();
-        for (Order o : orders) {
-            if ("SERVED".equals(o.getStatus())) {
-                YearMonth ym = YearMonth.from(o.getCreatedAt());
-                revenueMap.merge(ym, o.getTotalPrice(), Long::sum);
-            }
-        }
+        // 1. Get from Topups
+        Map<YearMonth, Long> topupRevenue = topupDAO.getMonthlyRevenueMap();
+        topupRevenue.forEach((ym, amount) -> revenueMap.merge(ym, amount, Long::sum));
+
+        // 2. Get from Orders
+        Map<YearMonth, Long> orderRevenue = orderDAO.getMonthlyRevenueMap();
+        orderRevenue.forEach((ym, amount) -> revenueMap.merge(ym, amount, Long::sum));
+
         return revenueMap;
     }
 
     public Map<java.time.LocalDate, Long> getDailyRevenue() throws Exception {
         Map<java.time.LocalDate, Long> revenueMap = new HashMap<>();
-        List<Topup> topups = topupDAO.findAll();
-        for (Topup t : topups) {
-            java.time.LocalDate date = t.getCreatedAt().toLocalDate();
-            revenueMap.merge(date, t.getAmount(), Long::sum);
-        }
-        List<Order> orders = orderDAO.findAll();
-        for (Order o : orders) {
-            if ("SERVED".equals(o.getStatus())) {
-                java.time.LocalDate date = o.getCreatedAt().toLocalDate();
-                revenueMap.merge(date, o.getTotalPrice(), Long::sum);
-            }
-        }
+
+        // 1. Get from Topups
+        Map<java.time.LocalDate, Long> topupRevenue = topupDAO.getDailyRevenueMap();
+        topupRevenue.forEach((date, amount) -> revenueMap.merge(date, amount, Long::sum));
+
+        // 2. Get from Orders
+        Map<java.time.LocalDate, Long> orderRevenue = orderDAO.getDailyRevenueMap();
+        orderRevenue.forEach((date, amount) -> revenueMap.merge(date, amount, Long::sum));
+
         return revenueMap;
     }
 
