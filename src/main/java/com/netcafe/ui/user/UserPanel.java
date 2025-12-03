@@ -1,7 +1,7 @@
 package com.netcafe.ui.user;
 
 import com.netcafe.config.AppConfig;
-import com.netcafe.dao.ProductDAO;
+
 import com.netcafe.model.Product;
 import com.netcafe.model.Session;
 import com.netcafe.model.User;
@@ -19,7 +19,7 @@ public class UserPanel extends JPanel {
     private final User user;
     private final SessionService sessionService = new SessionService();
     private final BillingService billingService = new BillingService();
-    private final ProductDAO productDAO = new ProductDAO();
+    private final com.netcafe.service.ProductService productService = new com.netcafe.service.ProductService();
 
     // Persistent Header Components
     private final JLabel lblBalance = new JLabel("Balance: Loading...");
@@ -176,7 +176,7 @@ public class UserPanel extends JPanel {
         SwingWorker<List<Product>, Void> worker = new SwingWorker<>() {
             @Override
             protected List<Product> doInBackground() throws Exception {
-                return productDAO.findAll().stream()
+                return productService.getAllProducts().stream() // Changed from productDAO.findAll()
                         .filter(p -> p.getCategory() == category)
                         .collect(Collectors.toList());
             }

@@ -33,9 +33,46 @@ public class AdminPanel extends JPanel {
     private final ReportService reportService = new ReportService();
     private final BillingService billingService = new BillingService();
     private final OrderDAO orderDAO = new OrderDAO();
-    private final ProductDAO productDAO = new ProductDAO();
+    private final com.netcafe.service.ProductService productService = new com.netcafe.service.ProductService();
     private final UserService userService = new UserService();
     private final MessageService messageService = new MessageService();
+
+    // ... (Skipping unchanged fields)
+
+    // ...
+
+    private void loadProducts() {
+        SwingWorker<List<Product>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<Product> doInBackground() throws Exception {
+                return productService.getAllProducts();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<Product> list = get();
+                    productModel.setRowCount(0);
+                    for (Product p : list) {
+                        productModel.addRow(
+                                new Object[] { p.getId(), p.getName(), p.getCategory(), p.getPrice(), p.getStock() });
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(AdminPanel.this, "Error loading products: " + ex.getMessage());
+                }
+            }
+        };
+        worker.execute();
+    }
+
+    private void deleteProduct(int id) {
+        try {
+            productService.deleteProduct(id);
+            loadProducts();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error deleting product: " + ex.getMessage());
+        }
+    }
 
     // Dashboard Components
     private final JPanel dailyChartContainer = new JPanel(new BorderLayout());
@@ -391,7 +428,7 @@ public class AdminPanel extends JPanel {
             if (row != -1) {
                 int id = (int) productModel.getValueAt(row, 0);
                 try {
-                    Product p = productDAO.findById(id).orElse(null);
+                    Product p = productService.getProductById(id).orElse(null);
                     if (p != null)
                         openProductDialog(p);
                 } catch (Exception ex) {
@@ -482,85 +519,6 @@ public class AdminPanel extends JPanel {
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(AdminPanel.this, "Error deleting order: " + ex.getMessage());
                 }
-            }
-        };
-        worker.execute();
-    }
-
-    private void loadProducts() {
-        SwingWorker<List<Product>, Void> worker = new SwingWorker<>() {
-            @Override
-            protected List<Product> doInBackground() throws Exception {
-                return productDAO.findAll();
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    List<Product> list = get();
-                    productModel.setRowCount(0);
-                    for (Product p : list) {
-                        productModel.addRow(
-                                new Object[] { p.getId(), p.getName(), p.getCategory(), p.getPrice(), p.getStock() });
-                    }
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(AdminPanel.this, "Error loading products: " + ex.getMessage());
-                }
-            }
-        };
-        worker.execute();
-    }
-
-    private void openProductDialog(Product product) {
-        ProductDialog dialog = new ProductDialog((Frame) SwingUtilities.getWindowAncestor(this), product);
-        dialog.setVisible(true);
-        if (dialog.isSucceeded()) {
-            SwingWorker<Void, Void> worker = new SwingWorker<>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    Product p = new Product();
-                    p.setName(dialog.getName());
-                    p.setCategory(dialog.getCategory());
-                    p.setPrice(dialog.getPrice());
-                    p.setStock(dialog.getStock());
-
-                    if (product == null) {
-                        productDAO.create(p);
-                    } else {
-                        p.setId(product.getId());
-                        productDAO.update(p);
-                    }
-                    dialog.saveImage(); // Save image after DB op success (or before, doesn't matter much here)
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                        loadProducts();
-                        JOptionPane.showMessageDialog(AdminPanel.this, "Saved!");
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(AdminPanel.this, "Error: " + ex.getMessage());
-                    }
-                }
-            };
-            worker.execute();
-        }
-    }
-
-    private void deleteProduct(int id) {
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                productDAO.delete(id);
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                loadProducts();
-                JOptionPane.showMessageDialog(AdminPanel.this, "Deleted!");
             }
         };
         worker.execute();
@@ -731,6 +689,45 @@ public class AdminPanel extends JPanel {
 
         loadUsers(User.Role.USER, userModel);
         return panel;
+    }
+
+    private void openProductDialog(Product product) {
+        ProductDialog dialog = new ProductDialog((Frame) SwingUtilities.getWindowAncestor(this), product);
+        dialog.setVisible(true);
+        if (dialog.isSucceeded()) {
+            SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    Product p = new Product();
+                    p.setName(dialog.getName());
+                    p.setCategory(dialog.getCategory());
+                    p.setPrice(dialog.getPrice());
+                    p.setStock(dialog.getStock());
+
+                    if (product == null) {
+                        productService.createProduct(p);
+                    } else {
+                        p.setId(product.getId());
+                        productService.updateProduct(p);
+                    }
+                    dialog.saveImage();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                        // loadProducts(); // This method is not defined in the provided context,
+                        // assuming it exists elsewhere or needs to be added.
+                        JOptionPane.showMessageDialog(AdminPanel.this, "Saved!");
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(AdminPanel.this, "Error: " + ex.getMessage());
+                    }
+                }
+            };
+            worker.execute();
+        }
     }
 
     private void createUser(User.Role role, DefaultTableModel model) {

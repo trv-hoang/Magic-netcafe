@@ -25,9 +25,14 @@ public class UserDAO {
     }
 
     public User create(User user) throws SQLException {
+        try (Connection conn = DBPool.getConnection()) {
+            return create(conn, user);
+        }
+    }
+
+    public User create(Connection conn, User user) throws SQLException {
         String sql = "INSERT INTO users (username, password_hash, full_name, role) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DBPool.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getPasswordHash());
             stmt.setString(3, user.getFullName());
