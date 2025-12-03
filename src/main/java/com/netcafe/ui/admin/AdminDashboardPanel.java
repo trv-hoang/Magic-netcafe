@@ -70,7 +70,8 @@ public class AdminDashboardPanel extends JPanel {
         layeredPane.add(adminTabs, JLayeredPane.DEFAULT_LAYER);
 
         // FAB (Layer 1)
-        DraggableRoundButton fab = new DraggableRoundButton(e -> {
+        DraggableRoundButton fab = new DraggableRoundButton();
+        fab.addActionListener(e -> {
             AIAnalystDialog dialog = new AIAnalystDialog(parentFrame);
             dialog.setVisible(true);
         });
@@ -88,10 +89,8 @@ public class AdminDashboardPanel extends JPanel {
     private static class DraggableRoundButton extends JButton {
         private Point initialClick;
         private boolean isDragging = false;
-        private final java.awt.event.ActionListener action;
 
-        public DraggableRoundButton(java.awt.event.ActionListener action) {
-            this.action = action;
+        public DraggableRoundButton() {
             setContentAreaFilled(false);
             setFocusPainted(false);
             setBorderPainted(false);
@@ -134,8 +133,8 @@ public class AdminDashboardPanel extends JPanel {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    if (!isDragging && action != null) {
-                        action.actionPerformed(new java.awt.event.ActionEvent(DraggableRoundButton.this,
+                    if (!isDragging) {
+                        fireActionPerformed(new java.awt.event.ActionEvent(DraggableRoundButton.this,
                                 java.awt.event.ActionEvent.ACTION_PERFORMED, "click"));
                     }
                     isDragging = false;

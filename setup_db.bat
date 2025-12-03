@@ -9,22 +9,38 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Try to connect as root
+:: Try to connect as root without password
 mysql -u root -e "SELECT 1" >nul 2>nul
 if %errorlevel% equ 0 (
     set AUTH_CMD=-u root
     goto :Setup
 )
 
-:: If root fails, try current user (no -u)
-mysql -e "SELECT 1" >nul 2>nul
+:: Try to connect as root WITH password
+echo Root access without password failed. Trying with password...
+mysql -u root -p -e "SELECT 1" >nul 2>nul
 if %errorlevel% equ 0 (
-    set AUTH_CMD=
+    set AUTH_CMD=-u root -p
     goto :Setup
 )
 
-echo Cannot connect to MySQL as root or current user without password.
-echo Please ensure MySQL is running and you have access.
+echo.
+echo Automatic connection failed.
+echo Please enter your MySQL credentials manually.
+set /p DB_USER=Username (default: root): 
+if "%DB_USER%"=="" set DB_USER=root
+set /p DB_PASS=Password: 
+
+:: Verify manual credentials
+mysql -u %DB_USER% --password="%DB_PASS%" -e "SELECT 1" >nul 2>nul
+if %errorlevel% equ 0 (
+    set AUTH_CMD=-u %DB_USER% --password="%DB_PASS%"
+    goto :Setup
+)
+
+echo.
+echo Error: Could not connect to MySQL with the provided credentials.
+echo Please check your username and password.
 pause
 exit /b 1
 

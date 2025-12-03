@@ -39,8 +39,4 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void logout() {
-        dispose();
-        new com.netcafe.ui.login.LoginFrame().setVisible(true);
-    }
 }
