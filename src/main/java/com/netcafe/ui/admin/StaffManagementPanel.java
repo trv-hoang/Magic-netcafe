@@ -57,10 +57,10 @@ public class StaffManagementPanel extends JPanel {
                 protected void done() {
                     try {
                         get();
-                        JOptionPane.showMessageDialog(StaffManagementPanel.this, "User Created!");
+                        com.netcafe.util.SwingUtils.showInfo(StaffManagementPanel.this, "User Created!");
                         loadUsers(role, model);
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(StaffManagementPanel.this, "Error: " + ex.getMessage());
+                        com.netcafe.util.SwingUtils.showError(StaffManagementPanel.this, "Error", ex);
                     }
                 }
             };
@@ -86,7 +86,7 @@ public class StaffManagementPanel extends JPanel {
                         }
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(StaffManagementPanel.this, "Error loading users: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(StaffManagementPanel.this, "Error loading users", ex);
                 }
             }
         };

@@ -196,9 +196,9 @@ public class OrderManagementPanel extends JPanel {
                     try {
                         get();
                         loadProducts();
-                        JOptionPane.showMessageDialog(OrderManagementPanel.this, "Saved!");
+                        com.netcafe.util.SwingUtils.showInfo(OrderManagementPanel.this, "Saved!");
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(OrderManagementPanel.this, "Error: " + ex.getMessage());
+                        com.netcafe.util.SwingUtils.showError(OrderManagementPanel.this, "Error loading products", ex);
                     }
                 }
             };
@@ -217,7 +217,7 @@ public class OrderManagementPanel extends JPanel {
             @Override
             protected void done() {
                 loadProducts();
-                JOptionPane.showMessageDialog(OrderManagementPanel.this, "Deleted!");
+                com.netcafe.util.SwingUtils.showInfo(OrderManagementPanel.this, "Deleted!");
             }
         };
         worker.execute();
@@ -239,8 +239,7 @@ public class OrderManagementPanel extends JPanel {
                         orderModel.addRow(new Object[] { o.getId(), o.getUserId(), o.getProductId(), o.getQty(),
                                 o.getTotalPrice(), o.getStatus() });
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(OrderManagementPanel.this,
-                            "Error loading orders: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(OrderManagementPanel.this, "Error loading orders", ex);
                 }
             }
         };
@@ -258,7 +257,7 @@ public class OrderManagementPanel extends JPanel {
             @Override
             protected void done() {
                 loadOrders();
-                JOptionPane.showMessageDialog(OrderManagementPanel.this, "Served!");
+                com.netcafe.util.SwingUtils.showInfo(OrderManagementPanel.this, "Served!");
             }
         };
         worker.execute();
@@ -277,10 +276,9 @@ public class OrderManagementPanel extends JPanel {
                 try {
                     get();
                     loadOrders();
-                    JOptionPane.showMessageDialog(OrderManagementPanel.this, "Order deleted!");
+                    com.netcafe.util.SwingUtils.showInfo(OrderManagementPanel.this, "Order deleted!");
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(OrderManagementPanel.this,
-                            "Error deleting order: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(OrderManagementPanel.this, "Error deleting order", ex);
                 }
             }
         };

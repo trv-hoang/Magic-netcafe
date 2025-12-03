@@ -112,7 +112,7 @@ public class MessagePanel extends JPanel {
                         }
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(MessagePanel.this, "Error loading chat users: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(MessagePanel.this, "Error loading chat users", ex);
                 }
             }
         };

@@ -127,7 +127,7 @@ public class DashboardPanel extends JPanel {
                     topSpendersArea.setText(sbUser.toString());
 
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(DashboardPanel.this, "Error loading dashboard: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(DashboardPanel.this, "Error loading dashboard", ex);
                 }
             }
         };

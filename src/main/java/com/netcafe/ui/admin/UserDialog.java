@@ -69,10 +69,7 @@ public class UserDialog extends JDialog {
 
         btnLogin.addActionListener(e -> {
             if (getUsername().trim().isEmpty() || getPassword().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(UserDialog.this,
-                        "Username and Password are required",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                com.netcafe.util.SwingUtils.showError(UserDialog.this, "Username and Password are required");
                 return;
             }
             succeeded = true;

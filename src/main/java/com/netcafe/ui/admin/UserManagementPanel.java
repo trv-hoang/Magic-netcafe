@@ -91,22 +91,21 @@ public class UserManagementPanel extends JPanel {
                             protected void done() {
                                 try {
                                     get();
-                                    JOptionPane.showMessageDialog(UserManagementPanel.this,
+                                    com.netcafe.util.SwingUtils.showInfo(UserManagementPanel.this,
                                             "Balance updated successfully!");
                                     loadUsers(User.Role.USER, userModel); // Refresh to show new balance
                                 } catch (Exception ex) {
-                                    JOptionPane.showMessageDialog(UserManagementPanel.this,
-                                            "Error: " + ex.getMessage());
+                                    com.netcafe.util.SwingUtils.showError(UserManagementPanel.this, "Error", ex);
                                 }
                             }
                         };
                         worker.execute();
                     } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(this, "Invalid amount. Please enter a positive number.");
+                        com.netcafe.util.SwingUtils.showError(this, "Invalid amount. Please enter a positive number.");
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Please select a user first.");
+                com.netcafe.util.SwingUtils.showError(this, "Please select a user first.");
             }
         });
 
@@ -129,10 +128,10 @@ public class UserManagementPanel extends JPanel {
                 protected void done() {
                     try {
                         get();
-                        JOptionPane.showMessageDialog(UserManagementPanel.this, "User Created!");
+                        com.netcafe.util.SwingUtils.showInfo(UserManagementPanel.this, "User Created!");
                         loadUsers(role, model);
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(UserManagementPanel.this, "Error: " + ex.getMessage());
+                        com.netcafe.util.SwingUtils.showError(UserManagementPanel.this, "Error", ex);
                     }
                 }
             };
@@ -170,7 +169,7 @@ public class UserManagementPanel extends JPanel {
                         }
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(UserManagementPanel.this, "Error loading users: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(UserManagementPanel.this, "Error loading users", ex);
                 }
             }
         };
@@ -188,7 +187,7 @@ public class UserManagementPanel extends JPanel {
             @Override
             protected void done() {
                 loadUsers(User.Role.USER, userModel);
-                JOptionPane.showMessageDialog(UserManagementPanel.this, "User Deleted");
+                com.netcafe.util.SwingUtils.showInfo(UserManagementPanel.this, "User Deleted");
             }
         };
         worker.execute();

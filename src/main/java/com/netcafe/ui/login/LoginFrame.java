@@ -164,8 +164,7 @@ public class LoginFrame extends JFrame {
                     if (ex instanceof java.util.concurrent.ExecutionException) {
                         msg = ex.getCause().getMessage();
                     }
-                    JOptionPane.showMessageDialog(LoginFrame.this, "Login failed: " + msg, "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    com.netcafe.util.SwingUtils.showError(LoginFrame.this, "Login failed: " + msg);
                 }
             }
         };

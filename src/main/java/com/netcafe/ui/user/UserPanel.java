@@ -160,7 +160,7 @@ public class UserPanel extends JPanel {
             JButton btnGame = new JButton(game);
             btnGame.setPreferredSize(new Dimension(180, 100));
             btnGame.setFont(new Font("SansSerif", Font.BOLD, 14));
-            btnGame.addActionListener(e -> JOptionPane.showMessageDialog(this, "Launching " + game + "..."));
+            btnGame.addActionListener(e -> com.netcafe.util.SwingUtils.showInfo(this, "Launching " + game + "..."));
             panel.add(btnGame);
         }
         return panel;
@@ -192,7 +192,7 @@ public class UserPanel extends JPanel {
                     gridPanel.revalidate();
                     gridPanel.repaint();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(UserPanel.this, "Error loading products: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(UserPanel.this, "Error loading products", ex);
                 }
             }
         };
@@ -471,7 +471,7 @@ public class UserPanel extends JPanel {
 
     private void checkout() {
         if (cartItems.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Cart is empty!");
+            com.netcafe.util.SwingUtils.showInfo(this, "Cart is empty!");
             return;
         }
 
@@ -567,13 +567,13 @@ public class UserPanel extends JPanel {
                 String text = txtCustom.getText().trim().replace(",", "").replace(".", "");
                 long amount = Long.parseLong(text);
                 if (amount <= 0) {
-                    JOptionPane.showMessageDialog(this, "Amount must be positive.");
+                    com.netcafe.util.SwingUtils.showError(this, "Amount must be positive.");
                     return;
                 }
                 requestTopup(amount);
                 txtCustom.setText("");
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid number format.");
+                com.netcafe.util.SwingUtils.showError(this, "Invalid number format.");
             }
         });
 
@@ -621,16 +621,16 @@ public class UserPanel extends JPanel {
                     protected void done() {
                         try {
                             get();
-                            JOptionPane.showMessageDialog(UserPanel.this, "Redeemed successfully!");
+                            com.netcafe.util.SwingUtils.showInfo(UserPanel.this, "Redeemed successfully!");
                             refreshBalance();
                         } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(UserPanel.this, "Error: " + ex.getMessage());
+                            com.netcafe.util.SwingUtils.showError(UserPanel.this, "Error", ex);
                         }
                     }
                 };
                 worker.execute();
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid number.");
+                com.netcafe.util.SwingUtils.showError(this, "Invalid number.");
             }
         }
     }
@@ -643,7 +643,7 @@ public class UserPanel extends JPanel {
         p.setPrice(amount);
         p.setStock(1);
         addToCart(p);
-        JOptionPane.showMessageDialog(this, "Topup added to cart. Please checkout to confirm.");
+        com.netcafe.util.SwingUtils.showInfo(this, "Topup added to cart. Please checkout to confirm.");
     }
 
     private void refreshBalance() {
@@ -728,7 +728,7 @@ public class UserPanel extends JPanel {
 
             if (remaining <= 0) {
                 stopSession();
-                JOptionPane.showMessageDialog(this, "Time is up!");
+                com.netcafe.util.SwingUtils.showInfo(this, "Time is up!");
             } else {
                 lblTimeRemaining.setText("Time Remaining: " + TimeUtil.formatDuration(remaining));
                 // Red if under 15 mins (900 seconds)
@@ -782,7 +782,7 @@ public class UserPanel extends JPanel {
                     get(); // Check for exceptions
                     closeApp();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(UserPanel.this, "Error stopping session: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(UserPanel.this, "Error stopping session", ex);
                     closeApp();
                 }
             }
@@ -873,7 +873,7 @@ public class UserPanel extends JPanel {
                             loadChat.run();
                             txtContent.setText("");
                         } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(UserPanel.this, "Error sending message: " + ex.getMessage());
+                            com.netcafe.util.SwingUtils.showError(UserPanel.this, "Error sending message", ex);
                         }
                     }
                 };

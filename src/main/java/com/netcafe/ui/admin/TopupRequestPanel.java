@@ -62,7 +62,7 @@ public class TopupRequestPanel extends JPanel {
                     for (TopupRequest r : list)
                         topupModel.addRow(new Object[] { r.getId(), r.getUserId(), r.getAmount(), r.getStatus() });
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(TopupRequestPanel.this, "Error loading topups: " + ex.getMessage());
+                    com.netcafe.util.SwingUtils.showError(TopupRequestPanel.this, "Error loading topups", ex);
                 }
             }
         };
@@ -80,7 +80,7 @@ public class TopupRequestPanel extends JPanel {
             @Override
             protected void done() {
                 loadTopupRequests();
-                JOptionPane.showMessageDialog(TopupRequestPanel.this, "Approved!");
+                com.netcafe.util.SwingUtils.showInfo(TopupRequestPanel.this, "Approved!");
             }
         };
         worker.execute();
