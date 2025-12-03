@@ -76,7 +76,13 @@ public class ProductDialog extends JDialog {
         // Buttons
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnSave = new JButton("Save");
+        btnSave.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+        btnSave.putClientProperty("JButton.buttonType", "roundRect");
+
         JButton btnCancel = new JButton("Cancel");
+        btnCancel.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnSave.addActionListener(e -> {
             if (validateInput()) {
