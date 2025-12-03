@@ -56,7 +56,7 @@ public class AdminPanel extends JPanel {
     private final DefaultTableModel productModel = new DefaultTableModel(
             new String[] { "ID", "Name", "Category", "Price", "Stock" }, 0);
     private final DefaultTableModel userModel = new DefaultTableModel(
-            new String[] { "ID", "Username", "Full Name", "Role", "Balance" }, 0);
+            new String[] { "ID", "Username", "Full Name", "Role", "Balance", "Points" }, 0);
 
     public AdminPanel() {
         setLayout(new BorderLayout());
@@ -70,9 +70,9 @@ public class AdminPanel extends JPanel {
 
         JButton btnLogout = new JButton("Logout");
         btnLogout.putClientProperty("JButton.buttonType", "roundRect");
-        btnLogout.setBackground(new Color(231, 76, 60)); // Red
+        btnLogout.setBackground(com.netcafe.ui.ThemeConfig.DANGER); // Red
         btnLogout.setForeground(Color.WHITE);
-        btnLogout.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btnLogout.setFont(com.netcafe.ui.ThemeConfig.FONT_SMALL);
         btnLogout.setMargin(new Insets(4, 12, 4, 12));
         btnLogout.setFocusPainted(false);
         btnLogout.addActionListener(e -> logout());
@@ -105,9 +105,11 @@ public class AdminPanel extends JPanel {
     // --- Dashboard ---
     private JPanel createDashboardPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(com.netcafe.ui.ThemeConfig.BG_MAIN);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JPanel chartsPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        chartsPanel.setBackground(com.netcafe.ui.ThemeConfig.BG_MAIN);
 
         dailyChartContainer.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         monthlyChartContainer.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
@@ -116,16 +118,25 @@ public class AdminPanel extends JPanel {
         chartsPanel.add(monthlyChartContainer);
 
         JPanel listsPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        listsPanel.setBackground(com.netcafe.ui.ThemeConfig.BG_MAIN);
         listsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new BorderLayout());
-        p1.setBorder(BorderFactory.createTitledBorder("Top Selling Products"));
-        topProductsArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        p1.setBorder(BorderFactory.createTitledBorder(null, "Top Selling Products",
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                com.netcafe.ui.ThemeConfig.FONT_SUBHEADER));
+        p1.setBackground(Color.WHITE);
+        topProductsArea.setFont(com.netcafe.ui.ThemeConfig.FONT_MONO);
         p1.add(new JScrollPane(topProductsArea));
 
         JPanel p2 = new JPanel(new BorderLayout());
-        p2.setBorder(BorderFactory.createTitledBorder("Top Spenders"));
-        topSpendersArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        p2.setBorder(BorderFactory.createTitledBorder(null, "Top Spenders",
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                com.netcafe.ui.ThemeConfig.FONT_SUBHEADER));
+        p2.setBackground(Color.WHITE);
+        topSpendersArea.setFont(com.netcafe.ui.ThemeConfig.FONT_MONO);
         p2.add(new JScrollPane(topSpendersArea));
 
         listsPanel.add(p1);
@@ -135,15 +146,19 @@ public class AdminPanel extends JPanel {
         splitPane.setResizeWeight(0.75); // 75% for charts
         splitPane.setBorder(null);
         splitPane.setDividerSize(10);
+        splitPane.setBackground(com.netcafe.ui.ThemeConfig.BG_MAIN);
 
         panel.add(splitPane, BorderLayout.CENTER);
 
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.putClientProperty("JButton.buttonType", "roundRect");
-        btnRefresh.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btnRefresh.setFont(com.netcafe.ui.ThemeConfig.FONT_SMALL);
+        btnRefresh.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
+        btnRefresh.setForeground(Color.WHITE);
         btnRefresh.setMargin(new Insets(5, 10, 5, 10)); // Smaller margin
 
         JPanel header = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        header.setBackground(com.netcafe.ui.ThemeConfig.BG_MAIN);
         header.add(btnRefresh);
         panel.add(header, BorderLayout.NORTH);
 
@@ -215,7 +230,7 @@ public class AdminPanel extends JPanel {
         plot.setOutlineVisible(false);
 
         LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new Color(52, 152, 219)); // Blue
+        renderer.setSeriesPaint(0, com.netcafe.ui.ThemeConfig.PRIMARY); // Blue
         renderer.setSeriesStroke(0, new BasicStroke(2.0f));
 
         dailyChartContainer.removeAll();
@@ -240,7 +255,7 @@ public class AdminPanel extends JPanel {
         plot.setOutlineVisible(false);
 
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new Color(46, 204, 113)); // Green
+        renderer.setSeriesPaint(0, com.netcafe.ui.ThemeConfig.SECONDARY); // Green
         renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter()); // Flat bars
         renderer.setShadowVisible(false);
 
@@ -263,9 +278,12 @@ public class AdminPanel extends JPanel {
         JButton btnRefresh = new JButton("Refresh");
         JButton btnApprove = new JButton("Approve Selected");
 
-        btnApprove.setBackground(new Color(46, 204, 113));
+        btnApprove.setBackground(com.netcafe.ui.ThemeConfig.SUCCESS);
         btnApprove.setForeground(Color.WHITE);
         btnApprove.putClientProperty("JButton.buttonType", "roundRect");
+        btnApprove.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+
+        btnRefresh.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnPanel.add(btnRefresh);
         btnPanel.add(btnApprove);
@@ -349,12 +367,17 @@ public class AdminPanel extends JPanel {
         JButton btnDelete = new JButton("Delete");
         JButton btnRefresh = new JButton("Refresh");
 
-        btnAdd.setBackground(new Color(46, 204, 113));
+        btnAdd.setBackground(com.netcafe.ui.ThemeConfig.SUCCESS);
         btnAdd.setForeground(Color.WHITE);
-        btnEdit.setBackground(new Color(241, 196, 15));
+        btnAdd.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+
+        btnEdit.setBackground(com.netcafe.ui.ThemeConfig.ACCENT);
         btnEdit.setForeground(Color.WHITE);
-        btnDelete.setBackground(new Color(231, 76, 60));
+        btnEdit.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+
+        btnDelete.setBackground(com.netcafe.ui.ThemeConfig.DANGER);
         btnDelete.setForeground(Color.WHITE);
+        btnDelete.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnPanel.add(btnAdd);
         btnPanel.add(btnEdit);
@@ -403,13 +426,21 @@ public class AdminPanel extends JPanel {
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnRefresh = new JButton("Refresh");
+        JButton btnDelete = new JButton("Delete Order");
         JButton btnServe = new JButton("Serve Order");
 
-        btnServe.setBackground(new Color(52, 152, 219));
+        btnServe.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
         btnServe.setForeground(Color.WHITE);
         btnServe.putClientProperty("JButton.buttonType", "roundRect");
+        btnServe.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+
+        btnDelete.setBackground(com.netcafe.ui.ThemeConfig.DANGER);
+        btnDelete.setForeground(Color.WHITE);
+        btnDelete.putClientProperty("JButton.buttonType", "roundRect");
+        btnDelete.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnPanel.add(btnRefresh);
+        btnPanel.add(btnDelete);
         btnPanel.add(btnServe);
         panel.add(btnPanel, BorderLayout.SOUTH);
 
@@ -419,9 +450,41 @@ public class AdminPanel extends JPanel {
             if (row != -1)
                 serveOrder((int) orderModel.getValueAt(row, 0));
         });
+        btnDelete.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row != -1) {
+                int id = (int) orderModel.getValueAt(row, 0);
+                if (JOptionPane.showConfirmDialog(panel, "Delete this order?", "Confirm",
+                        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    deleteOrder(id);
+                }
+            }
+        });
 
         loadOrders();
         return panel;
+    }
+
+    private void deleteOrder(int id) {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                orderDAO.delete(id);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    loadOrders();
+                    JOptionPane.showMessageDialog(AdminPanel.this, "Order deleted!");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(AdminPanel.this, "Error deleting order: " + ex.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     private void loadProducts() {
@@ -557,9 +620,10 @@ public class AdminPanel extends JPanel {
         JButton btnRefresh = new JButton("Refresh Staff");
         JButton btnCreate = new JButton("Create New Admin");
 
-        btnCreate.setBackground(new Color(52, 152, 219));
+        btnCreate.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
         btnCreate.setForeground(Color.WHITE);
         btnCreate.putClientProperty("JButton.buttonType", "roundRect");
+        btnCreate.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnPanel.add(btnRefresh);
         btnPanel.add(btnCreate);
@@ -589,24 +653,28 @@ public class AdminPanel extends JPanel {
         JButton btnDelete = new JButton("Delete Selected");
 
         // Create Button
-        btnCreate.setBackground(new Color(52, 152, 219));
+        btnCreate.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
         btnCreate.setForeground(Color.WHITE);
         btnCreate.putClientProperty("JButton.buttonType", "roundRect");
+        btnCreate.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         // Delete Button
-        btnDelete.setBackground(new Color(231, 76, 60));
+        btnDelete.setBackground(com.netcafe.ui.ThemeConfig.DANGER);
         btnDelete.setForeground(Color.WHITE);
         btnDelete.putClientProperty("JButton.buttonType", "roundRect");
+        btnDelete.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         // Refresh Button
-        btnRefresh.setBackground(new Color(52, 152, 219));
+        btnRefresh.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
         btnRefresh.setForeground(Color.WHITE);
         btnRefresh.putClientProperty("JButton.buttonType", "roundRect");
+        btnRefresh.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         // Set Balance Button
-        btnSetBalance.setBackground(new Color(241, 196, 15)); // Yellow/Orange
+        btnSetBalance.setBackground(com.netcafe.ui.ThemeConfig.ACCENT); // Yellow/Orange
         btnSetBalance.setForeground(Color.WHITE);
         btnSetBalance.putClientProperty("JButton.buttonType", "roundRect");
+        btnSetBalance.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnPanel.add(btnSetBalance);
         btnPanel.add(btnCreate);
@@ -726,7 +794,7 @@ public class AdminPanel extends JPanel {
                             if (role == User.Role.USER) {
                                 long balance = balances.getOrDefault(u.getId(), 0L);
                                 model.addRow(new Object[] { u.getId(), u.getUsername(), u.getFullName(), u.getRole(),
-                                        balance });
+                                        balance, u.getPoints() });
                             } else {
                                 model.addRow(new Object[] { u.getId(), u.getUsername(), u.getFullName(), u.getRole() });
                             }

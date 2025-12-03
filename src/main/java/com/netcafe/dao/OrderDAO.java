@@ -57,6 +57,15 @@ public class OrderDAO {
         }
     }
 
+    public void delete(int orderId) throws SQLException {
+        String sql = "DELETE FROM orders WHERE id = ?";
+        try (Connection conn = DBPool.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, orderId);
+            stmt.executeUpdate();
+        }
+    }
+
     public long getDailyRevenue(java.time.LocalDate date) throws SQLException {
         String sql = "SELECT SUM(total_price) FROM orders WHERE status = 'SERVED' AND DATE(created_at) = ?";
         try (Connection conn = DBPool.getConnection();
