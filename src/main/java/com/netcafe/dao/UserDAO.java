@@ -82,6 +82,34 @@ public class UserDAO {
         }
     }
 
+    public Optional<User> findById(Connection conn, int id) throws SQLException {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapRow(rs));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public void updatePoints(Connection conn, int userId, int newPoints) throws SQLException {
+        String sql = "UPDATE users SET points = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, newPoints);
+            stmt.setInt(2, userId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void updatePoints(int userId, int newPoints) throws SQLException {
+        try (Connection conn = DBPool.getConnection()) {
+            updatePoints(conn, userId, newPoints);
+        }
+    }
+
     private User mapRow(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id"));
@@ -89,6 +117,7 @@ public class UserDAO {
         user.setPasswordHash(rs.getString("password_hash"));
         user.setFullName(rs.getString("full_name"));
         user.setRole(User.Role.valueOf(rs.getString("role")));
+        user.setPoints(rs.getInt("points"));
         user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         return user;
     }

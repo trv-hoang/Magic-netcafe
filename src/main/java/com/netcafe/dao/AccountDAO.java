@@ -12,9 +12,14 @@ import java.util.Optional;
 public class AccountDAO {
 
     public void create(Account account) throws SQLException {
+        try (Connection conn = DBPool.getConnection()) {
+            create(conn, account);
+        }
+    }
+
+    public void create(Connection conn, Account account) throws SQLException {
         String sql = "INSERT INTO accounts (user_id, balance) VALUES (?, ?)";
-        try (Connection conn = DBPool.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, account.getUserId());
             stmt.setLong(2, account.getBalance());
             stmt.executeUpdate();
@@ -24,7 +29,7 @@ public class AccountDAO {
     public Optional<Account> findByUserId(int userId) throws SQLException {
         String sql = "SELECT * FROM accounts WHERE user_id = ?";
         try (Connection conn = DBPool.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {

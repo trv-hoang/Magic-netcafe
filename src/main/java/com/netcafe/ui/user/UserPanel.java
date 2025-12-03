@@ -23,6 +23,7 @@ public class UserPanel extends JPanel {
 
     // Persistent Header Components
     private final JLabel lblBalance = new JLabel("Balance: Loading...");
+    private final JLabel lblPoints = new JLabel("Points: --");
     private final JLabel lblTimeRemaining = new JLabel("Time Remaining: --:--:--");
     private final JLabel lblStatus = new JLabel("Status: IDLE");
 
@@ -47,7 +48,10 @@ public class UserPanel extends JPanel {
     private final DefaultTableModel cartModel = new DefaultTableModel(new String[] { "Name", "Price", "Qty" }, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
-            return false; // Handle clicks via MouseListener
+            return false; // Handle
+                          // clicks
+                          // via
+                          // MouseListener
         }
     };
     private final JLabel lblCartTotal = new JLabel("Total: 0 VND");
@@ -86,46 +90,53 @@ public class UserPanel extends JPanel {
 
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout(20, 0));
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
         // Bottom border separator + Padding
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)));
+                BorderFactory.createEmptyBorder(20, 30, 20, 30)));
 
         // Left: Welcome & Status
         JPanel leftPanel = new JPanel(new GridLayout(2, 1, 0, 5));
-        leftPanel.setBackground(Color.WHITE);
+        leftPanel.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
 
         JLabel lblWelcome = new JLabel("Welcome, " + user.getFullName());
-        lblWelcome.setFont(new Font("SansSerif", Font.BOLD, 20));
-        lblWelcome.setForeground(new Color(50, 50, 50));
+        lblWelcome.setFont(com.netcafe.ui.ThemeConfig.FONT_HEADER);
+        lblWelcome.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
 
-        lblStatus.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblStatus.setForeground(Color.GRAY);
+        lblStatus.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY);
+        lblStatus.setForeground(com.netcafe.ui.ThemeConfig.TEXT_SECONDARY);
 
         leftPanel.add(lblWelcome);
         leftPanel.add(lblStatus);
         panel.add(leftPanel, BorderLayout.WEST);
 
         // Center: Balance & Time
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 0, 5));
-        centerPanel.setBackground(Color.WHITE);
+        JPanel centerPanel = new JPanel(new GridLayout(3, 1, 0, 2));
+        centerPanel.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
 
-        lblBalance.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblBalance.setForeground(new Color(39, 174, 96)); // Green
+        lblBalance.setFont(com.netcafe.ui.ThemeConfig.FONT_SUBHEADER);
+        lblBalance.setForeground(com.netcafe.ui.ThemeConfig.SUCCESS); // Green
 
-        lblTimeRemaining.setFont(new Font("Monospaced", Font.BOLD, 18));
-        lblTimeRemaining.setForeground(Color.BLACK);
+        lblPoints.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+        lblPoints.setForeground(com.netcafe.ui.ThemeConfig.ACCENT); // Gold/Amber
+
+        lblTimeRemaining.setFont(com.netcafe.ui.ThemeConfig.FONT_MONO);
+        lblTimeRemaining.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
 
         centerPanel.add(lblBalance);
+        centerPanel.add(lblPoints);
         centerPanel.add(lblTimeRemaining);
         panel.add(centerPanel, BorderLayout.CENTER);
 
         // Right: Logout Button
         JButton btnLogout = new JButton("Logout");
         btnLogout.putClientProperty("JButton.buttonType", "roundRect");
-        btnLogout.setBackground(new Color(231, 76, 60)); // Red for logout
+        btnLogout.setBackground(com.netcafe.ui.ThemeConfig.DANGER); // Red for logout
         btnLogout.setForeground(Color.WHITE);
+        btnLogout.setFont(com.netcafe.ui.ThemeConfig.FONT_SMALL);
+        btnLogout.setMargin(new Insets(4, 12, 4, 12));
+        btnLogout.setFocusPainted(false);
         btnLogout.addActionListener(e -> logout());
 
         panel.add(btnLogout, BorderLayout.EAST);
@@ -192,21 +203,20 @@ public class UserPanel extends JPanel {
 
     private JPanel createProductCard(Product p) {
         JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(Color.WHITE);
+        card.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
         // Subtle border with padding
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)));
-        card.setPreferredSize(new Dimension(180, 240)); // Slightly larger
+        card.setPreferredSize(new Dimension(180, 260)); // Slightly larger
 
         // Preview Picture
         JLabel lblImage = new JLabel();
         lblImage.setPreferredSize(new Dimension(180, 120));
         lblImage.setHorizontalAlignment(SwingConstants.CENTER);
-        lblImage.setBackground(Color.WHITE);
+        lblImage.setBackground(new Color(241, 245, 249)); // Light gray bg
         lblImage.setOpaque(true);
 
-        // Try to load image
         // Try to load image
         String imagePath = "/images/" + p.getName() + ".jpg"; // Assuming JPG for now
         java.net.URL imgURL = getClass().getResource(imagePath);
@@ -251,26 +261,25 @@ public class UserPanel extends JPanel {
         card.add(lblImage, BorderLayout.CENTER);
 
         // Details
-        JPanel details = new JPanel(new GridLayout(3, 1, 0, 4)); // Increased gap
-        details.setBackground(Color.WHITE);
-        details.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
+        JPanel details = new JPanel(new GridLayout(3, 1, 0, 8)); // Increased gap
+        details.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
+        details.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
 
         JLabel lblName = new JLabel(p.getName(), SwingConstants.CENTER);
-        lblName.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblName.setForeground(new Color(30, 30, 30));
+        lblName.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+        lblName.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
 
         JLabel lblPrice = new JLabel(String.format("%,d VND", p.getPrice()), SwingConstants.CENTER);
-        lblPrice.setForeground(new Color(39, 174, 96)); // Green
-        lblPrice.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblPrice.setForeground(com.netcafe.ui.ThemeConfig.SUCCESS); // Green
+        lblPrice.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         JButton btnAdd = new JButton("Add to Cart");
         btnAdd.putClientProperty("JButton.buttonType", "roundRect");
-        btnAdd.putClientProperty("Component.arc", 999); // Pill shape
-        btnAdd.setBackground(new Color(52, 152, 219));
+        btnAdd.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFocusPainted(false);
-        btnAdd.setFont(new Font("SansSerif", Font.BOLD, 12));
-        btnAdd.setPreferredSize(new Dimension(0, 30)); // Fixed height
+        btnAdd.setFont(com.netcafe.ui.ThemeConfig.FONT_SMALL);
+        btnAdd.setPreferredSize(new Dimension(0, 32)); // Fixed height
 
         details.add(lblName);
         details.add(lblPrice);
@@ -316,13 +325,15 @@ public class UserPanel extends JPanel {
 
     private JPanel createCartPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setPreferredSize(new Dimension(380, 0)); // Increased width
+        panel.setPreferredSize(new Dimension(400, 0)); // Increased width
+        panel.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 1, 0, 0, new Color(230, 230, 230)),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)));
 
         JLabel lblTitle = new JLabel("Your Cart");
-        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 22));
+        lblTitle.setFont(com.netcafe.ui.ThemeConfig.FONT_HEADER);
+        lblTitle.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
         lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         panel.add(lblTitle, BorderLayout.NORTH);
 
@@ -330,13 +341,15 @@ public class UserPanel extends JPanel {
         table.setFillsViewportHeight(true);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
-        table.setRowHeight(45); // Taller rows
-        table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
+        table.setRowHeight(50); // Taller rows
+        table.getTableHeader().setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+        table.getTableHeader().setBackground(new Color(248, 250, 252));
         table.setSelectionBackground(new Color(240, 248, 255));
         table.setSelectionForeground(Color.BLACK);
+        table.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY);
 
         // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(140); // Name
+        table.getColumnModel().getColumn(0).setPreferredWidth(160); // Name
         table.getColumnModel().getColumn(1).setPreferredWidth(80); // Price
         table.getColumnModel().getColumn(2).setPreferredWidth(120); // Quantity Panel
 
@@ -373,28 +386,33 @@ public class UserPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
+        scrollPane.getViewport().setBackground(Color.WHITE);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout(0, 15));
+        bottomPanel.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 
-        lblCartTotal.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblCartTotal.setFont(com.netcafe.ui.ThemeConfig.FONT_SUBHEADER);
+        lblCartTotal.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
         lblCartTotal.setHorizontalAlignment(SwingConstants.RIGHT);
         bottomPanel.add(lblCartTotal, BorderLayout.NORTH);
 
         JPanel btnPanel = new JPanel(new GridLayout(1, 2, 15, 0));
+        btnPanel.setBackground(com.netcafe.ui.ThemeConfig.BG_PANEL);
+
         JButton btnClear = new JButton("Clear");
         JButton btnCheckout = new JButton("Checkout");
 
         btnClear.putClientProperty("JButton.buttonType", "roundRect");
-        btnClear.setBackground(new Color(231, 76, 60));
+        btnClear.setBackground(com.netcafe.ui.ThemeConfig.DANGER);
         btnClear.setForeground(Color.WHITE);
-        btnClear.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnClear.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnCheckout.putClientProperty("JButton.buttonType", "roundRect");
-        btnCheckout.setBackground(new Color(46, 204, 113));
+        btnCheckout.setBackground(com.netcafe.ui.ThemeConfig.SUCCESS);
         btnCheckout.setForeground(Color.WHITE);
-        btnCheckout.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnCheckout.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnPanel.add(btnClear);
         btnPanel.add(btnCheckout);
@@ -473,7 +491,8 @@ public class UserPanel extends JPanel {
                             // Topup request for total amount of this item (price * qty)
                             billingService.requestTopup(user.getId(), p.getPrice() * item.quantity);
                         } else {
-                            billingService.placeOrder(user.getId(), p.getId(), item.quantity, p.getPrice());
+                            billingService.placeOrder(user.getId(), p.getId(), item.quantity,
+                                    p.getPrice() * item.quantity);
                         }
                     }
                     return null;
@@ -489,6 +508,7 @@ public class UserPanel extends JPanel {
                         refreshCartTable();
                         refreshBalance();
                     } catch (Exception ex) {
+                        ex.printStackTrace(); // Print to console for debugging
                         JOptionPane.showMessageDialog(UserPanel.this, "Payment failed: " + ex.getMessage());
                     }
                 }
@@ -563,7 +583,56 @@ public class UserPanel extends JPanel {
 
         panel.add(customPanel, BorderLayout.SOUTH);
 
+        // 4. Redeem Points Panel
+        JPanel redeemPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        redeemPanel.setBackground(Color.WHITE);
+        JButton btnRedeem = new JButton("Redeem Points (100pts = 5k)");
+        btnRedeem.putClientProperty("JButton.buttonType", "roundRect");
+        btnRedeem.setBackground(new Color(155, 89, 182)); // Purple
+        btnRedeem.setForeground(Color.WHITE);
+        btnRedeem.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        btnRedeem.addActionListener(e -> redeemPoints());
+        redeemPanel.add(btnRedeem);
+
+        panel.add(redeemPanel, BorderLayout.EAST); // Put it on the right or bottom? Let's put it South of custom panel?
+        // Actually BorderLayout.SOUTH is taken. Let's wrap South in a container.
+        JPanel southContainer = new JPanel(new GridLayout(2, 1));
+        southContainer.add(customPanel);
+        southContainer.add(redeemPanel);
+        panel.add(southContainer, BorderLayout.SOUTH);
+
         return panel;
+    }
+
+    private void redeemPoints() {
+        String input = JOptionPane.showInputDialog(this, "Enter points to redeem (Min 100):");
+        if (input != null && !input.isEmpty()) {
+            try {
+                int points = Integer.parseInt(input);
+                SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        billingService.redeemPoints(user.getId(), points);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            get();
+                            JOptionPane.showMessageDialog(UserPanel.this, "Redeemed successfully!");
+                            refreshBalance();
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(UserPanel.this, "Error: " + ex.getMessage());
+                        }
+                    }
+                };
+                worker.execute();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid number.");
+            }
+        }
     }
 
     private void requestTopup(long amount) {
@@ -589,6 +658,24 @@ public class UserPanel extends JPanel {
                 try {
                     currentBalance = get();
                     lblBalance.setText("Balance: " + currentBalance + " VND");
+
+                    // Refresh points
+                    new SwingWorker<Integer, Void>() {
+                        @Override
+                        protected Integer doInBackground() throws Exception {
+                            return billingService.getPoints(user.getId());
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                int points = get();
+                                lblPoints.setText("Points: " + points);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }.execute();
                 } catch (Exception ex) {
                     System.err.println("Balance refresh error: " + ex.getMessage());
                 }

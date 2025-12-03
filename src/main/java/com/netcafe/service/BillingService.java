@@ -18,6 +18,7 @@ public class BillingService {
     private final TopupDAO topupDAO = new TopupDAO();
     private final OrderDAO orderDAO = new OrderDAO();
     private final TopupRequestDAO topupRequestDAO = new TopupRequestDAO();
+    private final com.netcafe.dao.UserDAO userDAO = new com.netcafe.dao.UserDAO();
 
     public void requestTopup(int userId, long amount) throws Exception {
         TopupRequest request = new TopupRequest(userId, amount);
@@ -47,11 +48,19 @@ public class BillingService {
                     accountDAO.updateBalance(conn, req.getUserId(), acc.getBalance() + req.getAmount());
                 } catch (Exception e) {
                     Account newAcc = new Account(req.getUserId(), req.getAmount());
-                    accountDAO.create(newAcc);
+                    accountDAO.create(conn, newAcc);
                 }
 
                 // 3. Update Request Status
                 topupRequestDAO.updateStatus(conn, requestId, TopupRequest.Status.APPROVED);
+
+                // 4. Award Points (1 Point per 1,000 VND)
+                int pointsEarned = (int) (req.getAmount() / 1000);
+                if (pointsEarned > 0) {
+                    com.netcafe.model.User user = userDAO.findById(conn, req.getUserId())
+                            .orElseThrow(() -> new Exception("User not found"));
+                    userDAO.updatePoints(conn, req.getUserId(), user.getPoints() + pointsEarned);
+                }
 
                 conn.commit();
             } catch (Exception e) {
@@ -83,7 +92,7 @@ public class BillingService {
                 } catch (Exception e) {
                     // Account might not exist
                     Account newAcc = new Account(userId, amount);
-                    accountDAO.create(newAcc);
+                    accountDAO.create(conn, newAcc);
                 }
 
                 conn.commit();
@@ -94,22 +103,43 @@ public class BillingService {
         }
     }
 
+    private final com.netcafe.dao.ProductDAO productDAO = new com.netcafe.dao.ProductDAO();
+
     public void placeOrder(int userId, int productId, int qty, long totalPrice) throws Exception {
         try (Connection conn = DBPool.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                // 1. Check balance
+                // 1. Check Product Stock (Locking would be better, but simple check for now)
+                com.netcafe.model.Product product = productDAO.findById(conn, productId)
+                        .orElseThrow(() -> new Exception("Product not found"));
+
+                if (product.getStock() < qty) {
+                    throw new Exception("Insufficient stock. Available: " + product.getStock());
+                }
+
+                // 2. Check balance
                 Account acc = accountDAO.getAccountForUpdate(conn, userId);
                 if (acc.getBalance() < totalPrice) {
                     throw new Exception("Insufficient balance for order.");
                 }
 
-                // 2. Deduct balance
+                // 3. Deduct Stock
+                productDAO.updateStock(conn, productId, product.getStock() - qty);
+
+                // 4. Deduct balance
                 accountDAO.updateBalance(conn, userId, acc.getBalance() - totalPrice);
 
-                // 3. Create Order
+                // 5. Create Order
                 Order order = new Order(userId, productId, qty, totalPrice);
                 orderDAO.create(conn, order);
+
+                // 4. Award Points (1 Point per 1,000 VND)
+                int pointsEarned = (int) (totalPrice / 1000);
+                if (pointsEarned > 0) {
+                    com.netcafe.model.User user = userDAO.findById(conn, userId)
+                            .orElseThrow(() -> new Exception("User not found"));
+                    userDAO.updatePoints(conn, userId, user.getPoints() + pointsEarned);
+                }
 
                 conn.commit();
             } catch (Exception e) {
@@ -135,7 +165,7 @@ public class BillingService {
                     // Account not found, create new one
                     // Note: create() uses its own connection/transaction
                     Account newAcc = new Account(userId, newBalance);
-                    accountDAO.create(newAcc);
+                    accountDAO.create(conn, newAcc);
                 }
                 conn.commit();
             } catch (Exception e) {
@@ -143,5 +173,51 @@ public class BillingService {
                 throw e;
             }
         }
+    }
+
+    public void redeemPoints(int userId, int pointsToRedeem) throws Exception {
+        if (pointsToRedeem <= 0)
+            return;
+
+        // Ratio: 100 Points = 5,000 VND
+        long amountVND = (pointsToRedeem / 100) * 5000;
+        if (amountVND <= 0)
+            throw new Exception("Minimum redemption is 100 points.");
+
+        try (Connection conn = DBPool.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                // 1. Check points (lock user row ideally, but for now just read)
+                com.netcafe.model.User user = userDAO.findById(conn, userId)
+                        .orElseThrow(() -> new Exception("User not found"));
+
+                if (user.getPoints() < pointsToRedeem) {
+                    throw new Exception("Insufficient points.");
+                }
+
+                // 2. Update Points
+                userDAO.updatePoints(conn, userId, user.getPoints() - pointsToRedeem);
+
+                // 3. Add Balance
+                try {
+                    Account acc = accountDAO.getAccountForUpdate(conn, userId);
+                    accountDAO.updateBalance(conn, userId, acc.getBalance() + amountVND);
+                } catch (Exception e) {
+                    // Create account if not exists
+                    Account newAcc = new Account(userId, amountVND);
+                    accountDAO.create(conn, newAcc);
+                }
+
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public int getPoints(int userId) throws Exception {
+        return userDAO.findAll().stream().filter(u -> u.getId() == userId).findFirst()
+                .map(com.netcafe.model.User::getPoints).orElse(0);
     }
 }
