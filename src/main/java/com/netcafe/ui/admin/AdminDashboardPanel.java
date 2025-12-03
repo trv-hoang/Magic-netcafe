@@ -14,15 +14,15 @@ public class AdminDashboardPanel extends JPanel {
 
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(33, 33, 33)); // Dark background
+        headerPanel.setBackground(new Color(33, 33, 33)); // Keep dark header for contrast
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JLabel titleLabel = new JLabel("Admin Dashboard");
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        titleLabel.setFont(ThemeConfig.FONT_HEADER);
         titleLabel.setForeground(Color.WHITE);
 
         JButton btnLogout = new JButton("Logout");
-        btnLogout.setBackground(new Color(220, 53, 69)); // Red
+        btnLogout.setBackground(ThemeConfig.DANGER);
         btnLogout.setForeground(Color.WHITE);
         btnLogout.setFocusPainted(false);
         btnLogout.addActionListener(e -> {
@@ -152,9 +152,9 @@ public class AdminDashboardPanel extends JPanel {
 
             // Background
             if (getModel().isArmed()) {
-                g2.setColor(new Color(0, 100, 200)); // Darker blue
+                g2.setColor(ThemeConfig.PRIMARY.darker());
             } else {
-                g2.setColor(new Color(0, 123, 255)); // Blue
+                g2.setColor(ThemeConfig.PRIMARY);
             }
             g2.fillOval(0, 0, getWidth(), getHeight());
 
@@ -163,7 +163,7 @@ public class AdminDashboardPanel extends JPanel {
             // Head
             g2.fillRoundRect(15, 15, 30, 25, 10, 10);
             // Eyes
-            g2.setColor(new Color(0, 123, 255));
+            g2.setColor(ThemeConfig.PRIMARY);
             g2.fillOval(20, 22, 6, 6);
             g2.fillOval(34, 22, 6, 6);
             // Antenna
