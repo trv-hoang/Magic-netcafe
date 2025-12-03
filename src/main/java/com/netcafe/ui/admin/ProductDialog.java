@@ -76,7 +76,13 @@ public class ProductDialog extends JDialog {
         // Buttons
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnSave = new JButton("Save");
+        btnSave.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+        btnSave.putClientProperty("JButton.buttonType", "roundRect");
+
         JButton btnCancel = new JButton("Cancel");
+        btnCancel.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
 
         btnSave.addActionListener(e -> {
             if (validateInput()) {
@@ -129,7 +135,7 @@ public class ProductDialog extends JDialog {
 
     private boolean validateInput() {
         if (txtName.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Name is required.");
+            com.netcafe.util.SwingUtils.showError(this, "Name is required.");
             return false;
         }
         try {
@@ -137,7 +143,7 @@ public class ProductDialog extends JDialog {
             if (price < 0)
                 throw new NumberFormatException();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid Price.");
+            com.netcafe.util.SwingUtils.showError(this, "Invalid Price.");
             return false;
         }
         try {
@@ -145,7 +151,7 @@ public class ProductDialog extends JDialog {
             if (stock < 0)
                 throw new NumberFormatException();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid Stock.");
+            com.netcafe.util.SwingUtils.showError(this, "Invalid Stock.");
             return false;
         }
         return true;
@@ -192,7 +198,7 @@ public class ProductDialog extends JDialog {
                     Files.copy(selectedImageFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error saving image: " + e.getMessage());
+                com.netcafe.util.SwingUtils.showError(this, "Error saving image", e);
             }
         }
     }

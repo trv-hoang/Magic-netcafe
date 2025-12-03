@@ -23,10 +23,9 @@ public class ProductDAO {
         return list;
     }
 
-    public Optional<Product> findById(int id) throws SQLException {
+    public Optional<Product> findById(Connection conn, int id) throws SQLException {
         String sql = "SELECT * FROM products WHERE id = ?";
-        try (Connection conn = DBPool.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -35,6 +34,21 @@ public class ProductDAO {
             }
         }
         return Optional.empty();
+    }
+
+    public void updateStock(Connection conn, int productId, int newStock) throws SQLException {
+        String sql = "UPDATE products SET stock = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, newStock);
+            stmt.setInt(2, productId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public Optional<Product> findById(int id) throws SQLException {
+        try (Connection conn = DBPool.getConnection()) {
+            return findById(conn, id);
+        }
     }
 
     public void create(Product product) throws SQLException {

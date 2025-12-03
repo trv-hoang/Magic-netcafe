@@ -16,7 +16,7 @@ public class LoginFrame extends JFrame {
     public LoginFrame() {
         setTitle("Magic netCafe Login");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(450, 300);
+        setSize(900, 600); // Larger window
         setLocationRelativeTo(null);
 
         // Set Icon
@@ -24,8 +24,6 @@ public class LoginFrame extends JFrame {
         if (iconURL != null) {
             Image icon = new ImageIcon(iconURL).getImage();
             setIconImage(icon);
-
-            // macOS Dock Icon
             try {
                 if (java.awt.Taskbar.isTaskbarSupported()) {
                     java.awt.Taskbar.getTaskbar().setIconImage(icon);
@@ -35,65 +33,101 @@ public class LoginFrame extends JFrame {
             }
         }
 
-        // Main Panel with padding
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+        // Main Layout: Split View (Left: Image/Brand, Right: Login Form)
+        JPanel mainPanel = new JPanel(new GridLayout(1, 2));
         setContentPane(mainPanel);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        // Left Panel (Brand)
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
 
-        // Title
+        JLabel lblBrand = new JLabel("Magic netCafe", SwingConstants.CENTER);
+        lblBrand.setFont(com.netcafe.ui.ThemeConfig.FONT_BRAND);
+        lblBrand.setForeground(Color.WHITE);
+        leftPanel.add(lblBrand, BorderLayout.CENTER);
+
+        JLabel lblSlogan = new JLabel("Experience the Magic of Gaming", SwingConstants.CENTER);
+        lblSlogan.setFont(com.netcafe.ui.ThemeConfig.FONT_SLOGAN);
+        lblSlogan.setForeground(com.netcafe.ui.ThemeConfig.TEXT_SLOGAN);
+        lblSlogan.setBorder(BorderFactory.createEmptyBorder(0, 0, 100, 0));
+        leftPanel.add(lblSlogan, BorderLayout.SOUTH);
+
+        mainPanel.add(leftPanel);
+
+        // Right Panel (Form)
+        JPanel rightPanel = new JPanel(new GridBagLayout());
+        rightPanel.setBackground(Color.WHITE);
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 0, 10, 0);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
+        gbc.weightx = 1.0;
+
+        // Welcome Text
+        JLabel lblWelcome = new JLabel("Welcome Back");
+        lblWelcome.setFont(com.netcafe.ui.ThemeConfig.FONT_HEADER);
+        lblWelcome.setForeground(com.netcafe.ui.ThemeConfig.TEXT_PRIMARY);
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        JLabel lblTitle = new JLabel("Magic netCafe", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 28));
-        lblTitle.setForeground(new Color(50, 100, 200));
-        mainPanel.add(lblTitle, gbc);
+        formPanel.add(lblWelcome, gbc);
+
+        JLabel lblSubtitle = new JLabel("Please enter your details to sign in.");
+        lblSubtitle.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY);
+        lblSubtitle.setForeground(com.netcafe.ui.ThemeConfig.TEXT_SECONDARY);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 30, 0);
+        formPanel.add(lblSubtitle, gbc);
 
         // Username
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.0;
-        mainPanel.add(new JLabel("Username:"), gbc);
+        gbc.gridy = 2;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        formPanel.add(new JLabel("Username"), gbc);
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        mainPanel.add(txtUsername, gbc);
+        txtUsername.setPreferredSize(new Dimension(300, 40));
+        txtUsername.putClientProperty("JTextField.placeholderText", "Enter your username");
+        gbc.gridy = 3;
+        formPanel.add(txtUsername, gbc);
 
         // Password
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0.0;
-        mainPanel.add(new JLabel("Password:"), gbc);
+        gbc.gridy = 4;
+        gbc.insets = new Insets(15, 0, 5, 0);
+        formPanel.add(new JLabel("Password"), gbc);
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        mainPanel.add(txtPassword, gbc);
+        txtPassword.setPreferredSize(new Dimension(300, 40));
+        txtPassword.putClientProperty("JTextField.placeholderText", "Enter your password");
+        gbc.gridy = 5;
+        gbc.insets = new Insets(5, 0, 30, 0);
+        formPanel.add(txtPassword, gbc);
 
         // Button
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        btnLogin.setPreferredSize(new Dimension(120, 40));
-        btnLogin.setFont(new Font("SansSerif", Font.BOLD, 14));
-        btnLogin.setBackground(new Color(50, 150, 250));
+        btnLogin.setPreferredSize(new Dimension(300, 45));
+        btnLogin.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
         btnLogin.setForeground(Color.WHITE);
+        btnLogin.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
+        btnLogin.putClientProperty("JButton.buttonType", "roundRect");
+        gbc.gridy = 6;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        formPanel.add(btnLogin, gbc);
 
-        mainPanel.add(btnLogin, gbc);
+        rightPanel.add(formPanel);
+        mainPanel.add(rightPanel);
 
         btnLogin.addActionListener(e -> login());
         getRootPane().setDefaultButton(btnLogin);
     }
 
     private void login() {
-        String username = txtUsername.getText();
+        String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            com.netcafe.util.SwingUtils.showError(this, "Please enter both username and password.");
+            return;
+        }
 
         SwingWorker<User, Void> worker = new SwingWorker<>() {
             @Override
@@ -135,8 +169,7 @@ public class LoginFrame extends JFrame {
                     if (ex instanceof java.util.concurrent.ExecutionException) {
                         msg = ex.getCause().getMessage();
                     }
-                    JOptionPane.showMessageDialog(LoginFrame.this, "Login failed: " + msg, "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    com.netcafe.util.SwingUtils.showError(LoginFrame.this, "Login failed: " + msg);
                 }
             }
         };

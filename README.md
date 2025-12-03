@@ -1,7 +1,5 @@
 # Magic netCafe Management Application
 
-A standalone Swing desktop application for managing a NetCafe, featuring user sessions, product ordering, and admin management.
-
 ## Features
 
 ### Core
@@ -36,13 +34,13 @@ A standalone Swing desktop application for managing a NetCafe, featuring user se
 - **Top-up Management**: View and approve/reject user top-up requests.
 - **User Management**: (Basic) Create users via database.
 
-## Prerequisites
+## Requirement
 
 - Java 17+
 - Maven
 - MySQL 8+
 
-## Setup
+## How to setup
 
 1. **Database Setup (Automatic)**:
    Run the provided script to create the database, user, and schema automatically:
@@ -81,7 +79,7 @@ A standalone Swing desktop application for managing a NetCafe, featuring user se
    db.password=secret
    ```
 
-## Build & Run
+## How to run
 
 1. **Build**:
 

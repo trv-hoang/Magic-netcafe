@@ -57,6 +57,15 @@ public class OrderDAO {
         }
     }
 
+    public void delete(int orderId) throws SQLException {
+        String sql = "DELETE FROM orders WHERE id = ?";
+        try (Connection conn = DBPool.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, orderId);
+            stmt.executeUpdate();
+        }
+    }
+
     public long getDailyRevenue(java.time.LocalDate date) throws SQLException {
         String sql = "SELECT SUM(total_price) FROM orders WHERE status = 'SERVED' AND DATE(created_at) = ?";
         try (Connection conn = DBPool.getConnection();
@@ -84,6 +93,37 @@ public class OrderDAO {
             }
         }
         return 0;
+    }
+
+    public java.util.Map<java.time.YearMonth, Long> getMonthlyRevenueMap() throws SQLException {
+        java.util.Map<java.time.YearMonth, Long> map = new java.util.HashMap<>();
+        String sql = "SELECT YEAR(created_at) as y, MONTH(created_at) as m, SUM(total_price) as total " +
+                "FROM orders WHERE status = 'SERVED' " +
+                "GROUP BY YEAR(created_at), MONTH(created_at)";
+        try (Connection conn = DBPool.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                java.time.YearMonth ym = java.time.YearMonth.of(rs.getInt("y"), rs.getInt("m"));
+                map.put(ym, rs.getLong("total"));
+            }
+        }
+        return map;
+    }
+
+    public java.util.Map<java.time.LocalDate, Long> getDailyRevenueMap() throws SQLException {
+        java.util.Map<java.time.LocalDate, Long> map = new java.util.HashMap<>();
+        String sql = "SELECT DATE(created_at) as d, SUM(total_price) as total " +
+                "FROM orders WHERE status = 'SERVED' " +
+                "GROUP BY DATE(created_at)";
+        try (Connection conn = DBPool.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                map.put(rs.getDate("d").toLocalDate(), rs.getLong("total"));
+            }
+        }
+        return map;
     }
 
     public java.util.Map<String, Integer> getTopSellingProducts(int limit) throws SQLException {

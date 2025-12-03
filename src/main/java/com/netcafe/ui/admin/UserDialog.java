@@ -62,16 +62,14 @@ public class UserDialog extends JDialog {
         panel.add(cbRole, cs);
 
         JButton btnLogin = new JButton("Create");
-        btnLogin.setBackground(new Color(52, 152, 219));
+        btnLogin.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
         btnLogin.setForeground(Color.WHITE);
+        btnLogin.setFont(com.netcafe.ui.ThemeConfig.FONT_BODY_BOLD);
         btnLogin.putClientProperty("JButton.buttonType", "roundRect");
 
         btnLogin.addActionListener(e -> {
             if (getUsername().trim().isEmpty() || getPassword().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(UserDialog.this,
-                        "Username and Password are required",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                com.netcafe.util.SwingUtils.showError(UserDialog.this, "Username and Password are required");
                 return;
             }
             succeeded = true;

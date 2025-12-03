@@ -26,13 +26,24 @@ public class UserService {
         user.setFullName(fullName);
         user.setRole(role);
 
-        userDAO.create(user);
+        try (java.sql.Connection conn = com.netcafe.util.DBPool.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                // 1. Create User
+                userDAO.create(conn, user);
 
-        // Create initial account
-        com.netcafe.model.Account account = new com.netcafe.model.Account();
-        account.setUserId(user.getId());
-        account.setBalance(0);
-        new com.netcafe.dao.AccountDAO().create(account);
+                // 2. Create initial account
+                com.netcafe.model.Account account = new com.netcafe.model.Account();
+                account.setUserId(user.getId());
+                account.setBalance(0);
+                new com.netcafe.dao.AccountDAO().create(conn, account);
+
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        }
     }
 
     public void deleteUser(int userId) throws Exception {
