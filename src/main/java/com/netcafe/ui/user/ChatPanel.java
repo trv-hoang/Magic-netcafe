@@ -16,8 +16,8 @@ public class ChatPanel extends JPanel {
     private final JTextArea chatArea = new JTextArea();
     private Timer chatTimer;
 
-    public ChatPanel(User user) {
-        this.user = user;
+    public ChatPanel(User currentUser) {
+        this.user = currentUser;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 

@@ -42,13 +42,13 @@ public class LoginFrame extends JFrame {
         leftPanel.setBackground(com.netcafe.ui.ThemeConfig.PRIMARY);
 
         JLabel lblBrand = new JLabel("Magic netCafe", SwingConstants.CENTER);
-        lblBrand.setFont(new Font("SansSerif", Font.BOLD, 48));
+        lblBrand.setFont(com.netcafe.ui.ThemeConfig.FONT_BRAND);
         lblBrand.setForeground(Color.WHITE);
         leftPanel.add(lblBrand, BorderLayout.CENTER);
 
         JLabel lblSlogan = new JLabel("Experience the Magic of Gaming", SwingConstants.CENTER);
-        lblSlogan.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        lblSlogan.setForeground(new Color(255, 255, 255, 200));
+        lblSlogan.setFont(com.netcafe.ui.ThemeConfig.FONT_SLOGAN);
+        lblSlogan.setForeground(com.netcafe.ui.ThemeConfig.TEXT_SLOGAN);
         lblSlogan.setBorder(BorderFactory.createEmptyBorder(0, 0, 100, 0));
         leftPanel.add(lblSlogan, BorderLayout.SOUTH);
 
@@ -121,8 +121,13 @@ public class LoginFrame extends JFrame {
     }
 
     private void login() {
-        String username = txtUsername.getText();
+        String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            com.netcafe.util.SwingUtils.showError(this, "Please enter both username and password.");
+            return;
+        }
 
         SwingWorker<User, Void> worker = new SwingWorker<>() {
             @Override

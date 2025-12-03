@@ -7,12 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class UserPanel extends JPanel {
-    private final User user;
+
     private final UserHeaderPanel headerPanel;
     private final CartPanel cartPanel;
 
     public UserPanel(User user) {
-        this.user = user;
+
         setLayout(new BorderLayout());
 
         // 1. Header

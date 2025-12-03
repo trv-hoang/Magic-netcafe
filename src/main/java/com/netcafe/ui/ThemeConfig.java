@@ -15,6 +15,7 @@ public class ThemeConfig {
     public static final Color BG_PANEL = Color.WHITE;
     public static final Color TEXT_PRIMARY = new Color(30, 41, 59); // Slate 800
     public static final Color TEXT_SECONDARY = new Color(100, 116, 139); // Slate 500
+    public static final Color TEXT_SLOGAN = new Color(255, 255, 255, 200); // White with transparency
 
     // Fonts
     public static final Font FONT_HEADER = new Font("SansSerif", Font.BOLD, 24);
@@ -23,6 +24,8 @@ public class ThemeConfig {
     public static final Font FONT_BODY_BOLD = new Font("SansSerif", Font.BOLD, 14);
     public static final Font FONT_SMALL = new Font("SansSerif", Font.PLAIN, 12);
     public static final Font FONT_MONO = new Font("Monospaced", Font.PLAIN, 14);
+    public static final Font FONT_BRAND = new Font("SansSerif", Font.BOLD, 48);
+    public static final Font FONT_SLOGAN = new Font("SansSerif", Font.PLAIN, 18);
 
     // Dimensions
     public static final int CORNER_RADIUS = 16;
