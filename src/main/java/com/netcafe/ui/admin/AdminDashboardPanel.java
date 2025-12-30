@@ -47,6 +47,7 @@ public class AdminDashboardPanel extends JPanel {
         adminTabs.addTab("Messages", new MessagePanel());
         // AI Analyst Tab REMOVED
         adminTabs.addTab("Computer Map", new ComputerMapPanel());
+        adminTabs.addTab("Statistics", new StatisticsPanel());
 
         // Handle resizing
         layeredPane.addComponentListener(new java.awt.event.ComponentAdapter() {
