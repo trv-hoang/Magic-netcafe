@@ -4,7 +4,6 @@ import com.netcafe.model.Product;
 import com.netcafe.model.User;
 import com.netcafe.service.BillingService;
 import com.netcafe.util.SwingUtils;
-import com.netcafe.ui.ThemeConfig;
 import com.netcafe.ui.component.TopupCard;
 import com.netcafe.ui.component.StyledButton;
 
@@ -63,21 +62,22 @@ public class TopupPanel extends JPanel {
         southContainer.setBackground(Color.WHITE);
 
         // Custom Amount Panel
-        JPanel customPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel customPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         customPanel.setBackground(new Color(248, 249, 250));
         customPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(230, 230, 230)),
-                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
-        customPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+                BorderFactory.createEmptyBorder(15, 25, 15, 25)));
+        customPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
 
         JLabel lblCustom = new JLabel("Custom:");
-        lblCustom.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        lblCustom.setFont(new Font("SansSerif", Font.BOLD, 16));
 
-        JTextField txtCustom = new JTextField(10);
-        txtCustom.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        txtCustom.putClientProperty("JTextField.placeholderText", "Amount...");
+        JTextField txtCustom = new JTextField(18);
+        txtCustom.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        txtCustom.putClientProperty("JTextField.placeholderText", "Enter amount...");
 
         JButton btnRequest = StyledButton.primary("Add to Cart");
+        btnRequest.setPreferredSize(new Dimension(130, 30));
         btnRequest.addActionListener(e -> {
             try {
                 String text = txtCustom.getText().trim().replace(",", "").replace(".", "");
@@ -106,6 +106,7 @@ public class TopupPanel extends JPanel {
         redeemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
         JButton btnRedeem = StyledButton.accent("Redeem Points (100pts = 5k)");
+        btnRedeem.setPreferredSize(new Dimension(250, 30));
         btnRedeem.addActionListener(e -> redeemPoints());
         redeemPanel.add(btnRedeem);
         southContainer.add(redeemPanel);
@@ -121,7 +122,6 @@ public class TopupPanel extends JPanel {
         p.setPrice(amount);
         p.setStock(1);
         onAddToCart.accept(p);
-        SwingUtils.showInfo(this, "Topup added to cart!");
     }
 
     private void redeemPoints() {

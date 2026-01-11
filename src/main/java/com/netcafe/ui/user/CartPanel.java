@@ -101,10 +101,13 @@ public class CartPanel extends JPanel {
         // Buttons row
         JPanel btnRow = new JPanel(new GridLayout(1, 2, 10, 0));
         btnRow.setBackground(Color.WHITE);
-        btnRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        btnRow.setPreferredSize(new Dimension(Integer.MAX_VALUE, 40));
+        btnRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
         JButton btnClear = StyledButton.danger("Clear");
         JButton btnCheckout = StyledButton.success("Checkout");
+        btnClear.setPreferredSize(new Dimension(0, 40));
+        btnCheckout.setPreferredSize(new Dimension(0, 40));
         btnCheckout.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         btnClear.addActionListener(e -> {

@@ -33,7 +33,7 @@ public class ProductCard extends JPanel {
     public ProductCard(String name, long price, String buttonText, Runnable onAction) {
         setLayout(new BorderLayout(0, 8));
         setBackground(Color.WHITE);
-        setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         setPreferredSize(new Dimension(CARD_WIDTH, CARD_HEIGHT));
         setMaximumSize(new Dimension(CARD_WIDTH, CARD_HEIGHT));
         setMinimumSize(new Dimension(CARD_WIDTH, CARD_HEIGHT));
@@ -89,7 +89,8 @@ public class ProductCard extends JPanel {
         btnAction.setBackground(new Color(52, 152, 219)); // Cyan blue
         btnAction.setForeground(Color.WHITE);
         btnAction.setFocusPainted(false);
-        btnAction.setFont(new Font("SansSerif", Font.BOLD, 11));
+        btnAction.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btnAction.setPreferredSize(new Dimension(IMAGE_SIZE - 30, 40));
         btnAction.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnAction.addActionListener(e -> {
             if (onAction != null)
@@ -141,17 +142,17 @@ public class ProductCard extends JPanel {
         details.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         lblName = new JLabel(name);
-        lblName.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblName.setFont(new Font("SansSerif", Font.BOLD, 15));
         lblName.setForeground(ThemeConfig.TEXT_PRIMARY);
         lblName.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         lblPrice = new JLabel(formatPrice(price));
-        lblPrice.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lblPrice.setFont(new Font("SansSerif", Font.BOLD, 14));
         lblPrice.setForeground(ThemeConfig.SUCCESS);
         lblPrice.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         details.add(lblName);
-        details.add(Box.createVerticalStrut(2));
+        details.add(Box.createVerticalStrut(3));
         details.add(lblPrice);
 
         JPanel detailsWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));

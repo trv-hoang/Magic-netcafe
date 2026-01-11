@@ -32,6 +32,7 @@ public class TopupCard extends JPanel {
 
         // Button
         JButton btn = StyledButton.primary(buttonText);
+        btn.setPreferredSize(new Dimension(0, 40));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.addActionListener(e -> {
             if (onAction != null)
