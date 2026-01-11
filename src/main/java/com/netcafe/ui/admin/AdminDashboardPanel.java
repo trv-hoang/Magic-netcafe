@@ -88,7 +88,9 @@ public class AdminDashboardPanel extends JPanel {
 
     // Custom Round Draggable Button
     private static class DraggableRoundButton extends JButton {
+        private static final int DRAG_THRESHOLD = 5; // Pixels before considered a drag
         private Point initialClick;
+        private Point pressPoint; // Track the original press location
         private boolean isDragging = false;
 
         public DraggableRoundButton() {
@@ -103,33 +105,43 @@ public class AdminDashboardPanel extends JPanel {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     initialClick = e.getPoint();
+                    pressPoint = e.getPoint();
                     isDragging = false;
                 }
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    isDragging = true;
+                    // Calculate total distance moved from press point
+                    double distance = Point.distance(pressPoint.x, pressPoint.y, e.getX(), e.getY());
 
-                    // get location of window
-                    int thisX = getLocation().x;
-                    int thisY = getLocation().y;
-
-                    // Determine how much the mouse moved since the initial click
-                    int xMoved = e.getX() - initialClick.x;
-                    int yMoved = e.getY() - initialClick.y;
-
-                    // Move window to this position
-                    int X = thisX + xMoved;
-                    int Y = thisY + yMoved;
-
-                    // Keep within parent bounds
-                    Container parent = getParent();
-                    if (parent != null) {
-                        X = Math.max(0, Math.min(X, parent.getWidth() - getWidth()));
-                        Y = Math.max(0, Math.min(Y, parent.getHeight() - getHeight()));
+                    // Only start dragging if we've moved past the threshold
+                    if (distance > DRAG_THRESHOLD) {
+                        isDragging = true;
                     }
 
-                    setLocation(X, Y);
+                    // Only move the button if we're actually dragging
+                    if (isDragging) {
+                        // get location of window
+                        int thisX = getLocation().x;
+                        int thisY = getLocation().y;
+
+                        // Determine how much the mouse moved since the initial click
+                        int xMoved = e.getX() - initialClick.x;
+                        int yMoved = e.getY() - initialClick.y;
+
+                        // Move window to this position
+                        int X = thisX + xMoved;
+                        int Y = thisY + yMoved;
+
+                        // Keep within parent bounds
+                        Container parent = getParent();
+                        if (parent != null) {
+                            X = Math.max(0, Math.min(X, parent.getWidth() - getWidth()));
+                            Y = Math.max(0, Math.min(Y, parent.getHeight() - getHeight()));
+                        }
+
+                        setLocation(X, Y);
+                    }
                 }
 
                 @Override
