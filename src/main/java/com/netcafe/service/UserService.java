@@ -25,6 +25,7 @@ public class UserService {
         user.setPasswordHash(hash);
         user.setFullName(fullName);
         user.setRole(role);
+        user.setTier(User.Tier.BRONZE); // Default tier for new users
 
         try (java.sql.Connection conn = com.netcafe.util.DBPool.getConnection()) {
             conn.setAutoCommit(false);
