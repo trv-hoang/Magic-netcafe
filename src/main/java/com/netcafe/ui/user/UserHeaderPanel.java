@@ -43,6 +43,10 @@ public class UserHeaderPanel extends JPanel {
         initUI();
         refreshBalance();
         checkActiveSession();
+
+        // Balance refresh timer - runs every 5 seconds
+        Timer balanceTimer = new Timer(5000, e -> refreshBalance());
+        balanceTimer.start();
     }
 
     private void initUI() {
@@ -112,7 +116,9 @@ public class UserHeaderPanel extends JPanel {
     }
 
     private void logout() {
-        if (SwingUtils.showConfirm(this, "Are you sure you want to logout?")) {
+        // Center dialog on the whole app window, not just header
+        java.awt.Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        if (SwingUtils.showConfirm(parentWindow, "Are you sure you want to logout?")) {
             stopSession();
         }
     }
@@ -234,6 +240,13 @@ public class UserHeaderPanel extends JPanel {
                     lblTimeRemaining.setForeground(new Color(231, 76, 60));
                 } else {
                     lblTimeRemaining.setForeground(ThemeConfig.TEXT_PRIMARY);
+                }
+
+                // Update displayed balance every 5 seconds based on time consumed
+                if (currentSession.getTimeConsumedSeconds() % 5 == 0) {
+                    long consumedAmount = (long) (currentSession.getTimeConsumedSeconds() * ratePerHour / 3600.0);
+                    long displayBalance = Math.max(0, currentBalance - consumedAmount);
+                    lblBalance.setText("Balance: " + String.format("%,d VND", displayBalance));
                 }
             }
 
