@@ -13,7 +13,7 @@ public class MainFrame extends JFrame {
 
         setTitle("Magic netCafe - " + user.getUsername());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 600);
+        setSize(1200, 800);
         setLocationRelativeTo(null);
 
         // Set Icon

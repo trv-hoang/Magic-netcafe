@@ -5,11 +5,16 @@ import com.netcafe.model.User;
 import com.netcafe.service.BillingService;
 import com.netcafe.util.SwingUtils;
 import com.netcafe.ui.ThemeConfig;
+import com.netcafe.ui.component.TopupCard;
+import com.netcafe.ui.component.StyledButton;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
+/**
+ * Panel for topping up user balance with predefined amounts or custom amount.
+ */
 public class TopupPanel extends JPanel {
     private final User user;
     private final BillingService billingService = new BillingService();
@@ -22,7 +27,7 @@ public class TopupPanel extends JPanel {
         this.onRedeemSuccess = onRedeemSuccess;
 
         setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         setBackground(Color.WHITE);
 
         initUI();
@@ -32,47 +37,47 @@ public class TopupPanel extends JPanel {
         // 1. Info Panel
         JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         infoPanel.setBackground(Color.WHITE);
-        JLabel lblInfo = new JLabel("Select an amount or enter a custom value to request top-up.");
-        lblInfo.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        JLabel lblInfo = new JLabel("Select an amount to add to your cart");
+        lblInfo.setFont(new Font("SansSerif", Font.PLAIN, 14));
         lblInfo.setForeground(Color.GRAY);
         infoPanel.add(lblInfo);
         add(infoPanel, BorderLayout.NORTH);
 
-        // 2. Quick Select Buttons (Grid)
-        JPanel gridPanel = new JPanel(new GridLayout(2, 3, 20, 20));
+        // 2. Quick Select Cards (GridLayout 2x3)
+        JPanel gridPanel = new JPanel(new GridLayout(2, 3, 15, 15));
         gridPanel.setBackground(Color.WHITE);
+        gridPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
         long[] amounts = { 10000, 20000, 50000, 100000, 200000, 500000 };
 
         for (long amount : amounts) {
-            JButton btn = new JButton(String.format("%,d VND", amount));
-            btn.setFont(new Font("SansSerif", Font.BOLD, 16));
-            btn.setFocusPainted(false);
-            btn.putClientProperty("JButton.buttonType", "roundRect");
-            btn.setBackground(new Color(236, 240, 241));
-            btn.setForeground(new Color(44, 62, 80));
-            btn.addActionListener(e -> requestTopup(amount));
-            gridPanel.add(btn);
+            TopupCard card = new TopupCard(amount, "Add to Cart", () -> requestTopup(amount));
+            gridPanel.add(card);
         }
+
         add(gridPanel, BorderLayout.CENTER);
 
         // 3. Custom Amount & Redeem
-        JPanel southContainer = new JPanel(new GridLayout(2, 1, 0, 20));
+        JPanel southContainer = new JPanel();
+        southContainer.setLayout(new BoxLayout(southContainer, BoxLayout.Y_AXIS));
         southContainer.setBackground(Color.WHITE);
 
-        // Custom Amount
-        JPanel customPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-        customPanel.setBackground(Color.WHITE);
-        customPanel.setBorder(BorderFactory.createTitledBorder("Custom Amount"));
+        // Custom Amount Panel
+        JPanel customPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        customPanel.setBackground(new Color(248, 249, 250));
+        customPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
+        customPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
-        JTextField txtCustom = new JTextField(12);
-        txtCustom.putClientProperty("JTextField.placeholderText", "Enter amount...");
+        JLabel lblCustom = new JLabel("Custom:");
+        lblCustom.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
-        JButton btnRequest = new JButton("Request Top-up");
-        btnRequest.putClientProperty("JButton.buttonType", "roundRect");
-        btnRequest.setBackground(ThemeConfig.PRIMARY);
-        btnRequest.setForeground(Color.WHITE);
-        btnRequest.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JTextField txtCustom = new JTextField(10);
+        txtCustom.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        txtCustom.putClientProperty("JTextField.placeholderText", "Amount...");
 
+        JButton btnRequest = StyledButton.primary("Add to Cart");
         btnRequest.addActionListener(e -> {
             try {
                 String text = txtCustom.getText().trim().replace(",", "").replace(".", "");
@@ -88,20 +93,19 @@ public class TopupPanel extends JPanel {
             }
         });
 
-        customPanel.add(new JLabel("Amount (VND):"));
+        customPanel.add(lblCustom);
         customPanel.add(txtCustom);
         customPanel.add(btnRequest);
         southContainer.add(customPanel);
 
-        // Redeem Points
+        southContainer.add(Box.createVerticalStrut(10));
+
+        // Redeem Points Panel
         JPanel redeemPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         redeemPanel.setBackground(Color.WHITE);
-        JButton btnRedeem = new JButton("Redeem Points (100pts = 5k)");
-        btnRedeem.putClientProperty("JButton.buttonType", "roundRect");
-        btnRedeem.setBackground(ThemeConfig.ACCENT);
-        btnRedeem.setForeground(Color.WHITE);
-        btnRedeem.setFont(new Font("SansSerif", Font.BOLD, 14));
+        redeemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
+        JButton btnRedeem = StyledButton.accent("Redeem Points (100pts = 5k)");
         btnRedeem.addActionListener(e -> redeemPoints());
         redeemPanel.add(btnRedeem);
         southContainer.add(redeemPanel);
@@ -111,13 +115,13 @@ public class TopupPanel extends JPanel {
 
     private void requestTopup(long amount) {
         Product p = new Product();
-        p.setId(-1); // Dummy ID
-        p.setName("Topup " + amount);
+        p.setId(-1);
+        p.setName("Topup " + formatPrice(amount));
         p.setCategory(Product.Category.TOPUP);
         p.setPrice(amount);
         p.setStock(1);
         onAddToCart.accept(p);
-        SwingUtils.showInfo(this, "Topup added to cart. Please checkout to confirm.");
+        SwingUtils.showInfo(this, "Topup added to cart!");
     }
 
     private void redeemPoints() {
@@ -148,5 +152,9 @@ public class TopupPanel extends JPanel {
                 SwingUtils.showError(this, "Invalid number.");
             }
         }
+    }
+
+    private static String formatPrice(long price) {
+        return String.format("%,dđ", price).replace(",", ".");
     }
 }

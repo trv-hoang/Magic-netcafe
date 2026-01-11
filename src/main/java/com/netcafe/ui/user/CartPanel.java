@@ -5,13 +5,16 @@ import com.netcafe.model.User;
 import com.netcafe.service.BillingService;
 import com.netcafe.util.SwingUtils;
 import com.netcafe.ui.ThemeConfig;
+import com.netcafe.ui.component.StyledButton;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Modern cart panel with card-based items, empty state, and sticky total.
+ */
 public class CartPanel extends JPanel {
     private final User user;
     private final BillingService billingService = new BillingService();
@@ -28,120 +31,203 @@ public class CartPanel extends JPanel {
     }
 
     private final List<CartItem> cartItems = new ArrayList<>();
-    private final DefaultTableModel cartModel = new DefaultTableModel(new String[] { "Name", "Price", "Qty" }, 0) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
-    private final JLabel lblCartTotal = new JLabel("Total: 0 VND");
+    private final JPanel itemsPanel;
+    private final JPanel emptyStatePanel;
+    private final JLabel lblTotal;
 
     public CartPanel(User user, Runnable onCheckoutSuccess) {
         this.user = user;
         this.onCheckoutSuccess = onCheckoutSuccess;
 
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(400, 0));
-        setBackground(ThemeConfig.BG_PANEL);
-        setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 1, 0, 0, new Color(230, 230, 230)),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+        setPreferredSize(new Dimension(350, 0));
+        setBackground(Color.WHITE);
+        setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, new Color(230, 230, 230)));
 
-        initUI();
-    }
+        // Header
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(Color.WHITE);
+        header.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)));
 
-    private void initUI() {
         JLabel lblTitle = new JLabel("Your Cart");
-        lblTitle.setFont(ThemeConfig.FONT_HEADER);
+        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
         lblTitle.setForeground(ThemeConfig.TEXT_PRIMARY);
-        lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-        add(lblTitle, BorderLayout.NORTH);
+        header.add(lblTitle, BorderLayout.WEST);
+        add(header, BorderLayout.NORTH);
 
-        JTable table = new JTable(cartModel);
-        table.setFillsViewportHeight(true);
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(0, 0));
-        table.setRowHeight(50);
-        table.getTableHeader().setFont(ThemeConfig.FONT_BODY_BOLD);
-        table.getTableHeader().setBackground(new Color(248, 250, 252));
-        table.setSelectionBackground(new Color(240, 248, 255));
-        table.setSelectionForeground(Color.BLACK);
-        table.setFont(ThemeConfig.FONT_BODY);
+        // Items container (scrollable)
+        itemsPanel = new JPanel();
+        itemsPanel.setLayout(new BoxLayout(itemsPanel, BoxLayout.Y_AXIS));
+        itemsPanel.setBackground(new Color(248, 249, 250));
 
-        table.getColumnModel().getColumn(0).setPreferredWidth(160);
-        table.getColumnModel().getColumn(1).setPreferredWidth(80);
-        table.getColumnModel().getColumn(2).setPreferredWidth(120);
-        table.getColumnModel().getColumn(2).setCellRenderer(new QuantityCellRenderer());
-
-        table.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                int row = table.rowAtPoint(e.getPoint());
-                int col = table.columnAtPoint(e.getPoint());
-
-                if (row >= 0 && col == 2) {
-                    Rectangle cellRect = table.getCellRect(row, col, false);
-                    int x = e.getX() - cellRect.x;
-                    int width = cellRect.width;
-                    int oneThird = width / 3;
-
-                    if (x < oneThird) {
-                        CartItem item = cartItems.get(row);
-                        item.quantity--;
-                        if (item.quantity <= 0) {
-                            cartItems.remove(row);
-                        }
-                        refreshCartTable();
-                    } else if (x >= 2 * oneThird) {
-                        cartItems.get(row).quantity++;
-                        refreshCartTable();
-                    }
-                }
-            }
-        });
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
-        scrollPane.getViewport().setBackground(Color.WHITE);
+        JScrollPane scrollPane = new JScrollPane(itemsPanel);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel bottomPanel = new JPanel(new BorderLayout(0, 15));
-        bottomPanel.setBackground(ThemeConfig.BG_PANEL);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+        // Empty state panel
+        emptyStatePanel = createEmptyState();
+        itemsPanel.add(emptyStatePanel);
 
-        lblCartTotal.setFont(ThemeConfig.FONT_SUBHEADER);
-        lblCartTotal.setForeground(ThemeConfig.TEXT_PRIMARY);
-        lblCartTotal.setHorizontalAlignment(SwingConstants.RIGHT);
-        bottomPanel.add(lblCartTotal, BorderLayout.NORTH);
+        // Bottom panel (sticky total + buttons)
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setBackground(Color.WHITE);
+        bottomPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)));
 
-        JPanel btnPanel = new JPanel(new GridLayout(1, 2, 15, 0));
-        btnPanel.setBackground(ThemeConfig.BG_PANEL);
+        // Total row
+        JPanel totalRow = new JPanel(new BorderLayout());
+        totalRow.setBackground(Color.WHITE);
+        totalRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
-        JButton btnClear = new JButton("Clear");
-        JButton btnCheckout = new JButton("Checkout");
+        JLabel lblTotalLabel = new JLabel("Total");
+        lblTotalLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        lblTotalLabel.setForeground(Color.GRAY);
 
-        btnClear.putClientProperty("JButton.buttonType", "roundRect");
-        btnClear.setBackground(ThemeConfig.DANGER);
-        btnClear.setForeground(Color.WHITE);
-        btnClear.setFont(ThemeConfig.FONT_BODY_BOLD);
+        lblTotal = new JLabel("0đ");
+        lblTotal.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblTotal.setForeground(ThemeConfig.SUCCESS);
 
-        btnCheckout.putClientProperty("JButton.buttonType", "roundRect");
-        btnCheckout.setBackground(ThemeConfig.SUCCESS);
-        btnCheckout.setForeground(Color.WHITE);
-        btnCheckout.setFont(ThemeConfig.FONT_BODY_BOLD);
+        totalRow.add(lblTotalLabel, BorderLayout.WEST);
+        totalRow.add(lblTotal, BorderLayout.EAST);
+        bottomPanel.add(totalRow);
+        bottomPanel.add(Box.createVerticalStrut(15));
 
-        btnPanel.add(btnClear);
-        btnPanel.add(btnCheckout);
-        bottomPanel.add(btnPanel, BorderLayout.CENTER);
+        // Buttons row
+        JPanel btnRow = new JPanel(new GridLayout(1, 2, 10, 0));
+        btnRow.setBackground(Color.WHITE);
+        btnRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
-        add(bottomPanel, BorderLayout.SOUTH);
+        JButton btnClear = StyledButton.danger("Clear");
+        JButton btnCheckout = StyledButton.success("Checkout");
+        btnCheckout.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         btnClear.addActionListener(e -> {
             cartItems.clear();
-            refreshCartTable();
+            refreshCart();
         });
 
         btnCheckout.addActionListener(e -> checkout());
+
+        btnRow.add(btnClear);
+        btnRow.add(btnCheckout);
+        bottomPanel.add(btnRow);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    private JPanel createEmptyState() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(new Color(248, 249, 250));
+        panel.setBorder(BorderFactory.createEmptyBorder(60, 20, 60, 20));
+
+        JLabel msgLabel = new JLabel("Your cart is empty");
+        msgLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        msgLabel.setForeground(Color.GRAY);
+        msgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subLabel = new JLabel("Add items from the menu");
+        subLabel.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        subLabel.setForeground(new Color(150, 150, 150));
+        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        panel.add(msgLabel);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(subLabel);
+
+        return panel;
+    }
+
+    private JPanel createCartItemCard(CartItem item, int index) {
+        JPanel card = new JPanel(new BorderLayout(10, 0));
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(240, 240, 240)),
+                BorderFactory.createEmptyBorder(12, 15, 12, 15)));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+
+        // Left: Name + Unit price
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBackground(Color.WHITE);
+
+        JLabel lblName = new JLabel(item.product.getName());
+        lblName.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblName.setForeground(ThemeConfig.TEXT_PRIMARY);
+
+        JLabel lblUnitPrice = new JLabel(formatPrice(item.product.getPrice()) + " each");
+        lblUnitPrice.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        lblUnitPrice.setForeground(Color.GRAY);
+
+        leftPanel.add(lblName);
+        leftPanel.add(Box.createVerticalStrut(3));
+        leftPanel.add(lblUnitPrice);
+        card.add(leftPanel, BorderLayout.CENTER);
+
+        // Right: Quantity selector + Subtotal
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBackground(Color.WHITE);
+
+        // Quantity selector
+        JPanel qtyPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        qtyPanel.setBackground(Color.WHITE);
+
+        JButton btnMinus = createQtyButton("-");
+        JLabel lblQty = new JLabel(String.valueOf(item.quantity));
+        lblQty.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblQty.setPreferredSize(new Dimension(30, 25));
+        lblQty.setHorizontalAlignment(SwingConstants.CENTER);
+        JButton btnPlus = createQtyButton("+");
+
+        btnMinus.addActionListener(e -> {
+            item.quantity--;
+            if (item.quantity <= 0) {
+                cartItems.remove(index);
+            }
+            refreshCart();
+        });
+
+        btnPlus.addActionListener(e -> {
+            item.quantity++;
+            refreshCart();
+        });
+
+        qtyPanel.add(btnMinus);
+        qtyPanel.add(lblQty);
+        qtyPanel.add(btnPlus);
+
+        // Subtotal
+        JLabel lblSubtotal = new JLabel(formatPrice(item.product.getPrice() * item.quantity));
+        lblSubtotal.setFont(new Font("SansSerif", Font.BOLD, 13));
+        lblSubtotal.setForeground(ThemeConfig.SUCCESS);
+        lblSubtotal.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        rightPanel.add(qtyPanel);
+        rightPanel.add(Box.createVerticalStrut(3));
+        rightPanel.add(lblSubtotal);
+
+        card.add(rightPanel, BorderLayout.EAST);
+
+        return card;
+    }
+
+    private JButton createQtyButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setPreferredSize(new Dimension(28, 25));
+        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setBackground(new Color(240, 240, 240));
+        btn.setForeground(ThemeConfig.TEXT_PRIMARY);
+        btn.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     public void addToCart(Product p) {
@@ -160,24 +246,30 @@ public class CartPanel extends JPanel {
         if (!found) {
             cartItems.add(new CartItem(p, 1));
         }
-        refreshCartTable();
+        refreshCart();
     }
 
-    private void refreshCartTable() {
-        cartModel.setRowCount(0);
-        for (CartItem item : cartItems) {
-            cartModel.addRow(new Object[] {
-                    item.product.getName(),
-                    item.product.getPrice(),
-                    item.quantity
-            });
+    private void refreshCart() {
+        itemsPanel.removeAll();
+
+        if (cartItems.isEmpty()) {
+            itemsPanel.add(emptyStatePanel);
+        } else {
+            for (int i = 0; i < cartItems.size(); i++) {
+                itemsPanel.add(createCartItemCard(cartItems.get(i), i));
+            }
+            // Add some padding at bottom
+            itemsPanel.add(Box.createVerticalGlue());
         }
-        updateCartTotal();
+
+        updateTotal();
+        itemsPanel.revalidate();
+        itemsPanel.repaint();
     }
 
-    private void updateCartTotal() {
+    private void updateTotal() {
         long total = cartItems.stream().mapToLong(i -> i.product.getPrice() * i.quantity).sum();
-        lblCartTotal.setText("Total: " + String.format("%,d VND", total));
+        lblTotal.setText(formatPrice(total));
     }
 
     private void checkout() {
@@ -188,7 +280,7 @@ public class CartPanel extends JPanel {
 
         long total = cartItems.stream().mapToLong(i -> i.product.getPrice() * i.quantity).sum();
 
-        if (SwingUtils.showConfirm(this, "Pay " + String.format("%,d VND", total) + " for items?")) {
+        if (SwingUtils.showConfirm(this, "Pay " + formatPrice(total) + " for items?")) {
             SwingWorker<Void, Void> worker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() throws Exception {
@@ -209,9 +301,9 @@ public class CartPanel extends JPanel {
                     try {
                         get();
                         SwingUtils.showInfo(CartPanel.this,
-                                "Order placed successfully! Admin will serve/approve your requests.");
+                                "Order placed! Admin will serve your requests.");
                         cartItems.clear();
-                        refreshCartTable();
+                        refreshCart();
                         onCheckoutSuccess.run();
                     } catch (Exception ex) {
                         SwingUtils.showError(CartPanel.this, "Payment failed", ex);
@@ -222,37 +314,7 @@ public class CartPanel extends JPanel {
         }
     }
 
-    // Custom Renderer for Quantity Column
-    class QuantityCellRenderer extends JPanel implements javax.swing.table.TableCellRenderer {
-        private final JButton btnMinus = new JButton("-");
-        private final JLabel lblQty = new JLabel("0");
-        private final JButton btnPlus = new JButton("+");
-
-        public QuantityCellRenderer() {
-            setLayout(new GridLayout(1, 3, 2, 0));
-            setOpaque(true);
-            setBackground(Color.WHITE);
-
-            btnMinus.setFocusable(false);
-            btnPlus.setFocusable(false);
-            lblQty.setHorizontalAlignment(SwingConstants.CENTER);
-            lblQty.setFont(new Font("SansSerif", Font.BOLD, 12));
-
-            add(btnMinus);
-            add(lblQty);
-            add(btnPlus);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
-            if (isSelected) {
-                setBackground(table.getSelectionBackground());
-            } else {
-                setBackground(Color.WHITE);
-            }
-            lblQty.setText(value.toString());
-            return this;
-        }
+    private static String formatPrice(long price) {
+        return String.format("%,dđ", price).replace(",", ".");
     }
 }
