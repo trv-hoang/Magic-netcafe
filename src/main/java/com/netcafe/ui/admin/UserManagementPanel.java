@@ -65,8 +65,20 @@ public class UserManagementPanel extends JPanel {
         btnCreate.addActionListener(e -> createUser(User.Role.USER, userModel));
         btnDelete.addActionListener(e -> {
             int row = table.getSelectedRow();
-            if (row != -1)
-                deleteUser((int) userModel.getValueAt(row, 0));
+            if (row != -1) {
+                String username = (String) userModel.getValueAt(row, 1);
+                int confirm = JOptionPane.showConfirmDialog(
+                        this,
+                        "Are you sure you want to delete user '" + username + "'?\nThis action cannot be undone.",
+                        "Confirm Delete",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    deleteUser((int) userModel.getValueAt(row, 0));
+                }
+            } else {
+                com.netcafe.util.SwingUtils.showError(this, "Please select a user first.");
+            }
         });
 
         btnSetBalance.addActionListener(e -> {
@@ -186,8 +198,15 @@ public class UserManagementPanel extends JPanel {
 
             @Override
             protected void done() {
-                loadUsers(User.Role.USER, userModel);
-                com.netcafe.util.SwingUtils.showInfo(UserManagementPanel.this, "User Deleted");
+                try {
+                    get(); // This will throw if doInBackground failed
+                    loadUsers(User.Role.USER, userModel);
+                    com.netcafe.util.SwingUtils.showInfo(UserManagementPanel.this, "User Deleted");
+                } catch (Exception ex) {
+                    com.netcafe.util.SwingUtils.showError(UserManagementPanel.this,
+                            "Failed to delete user: " + ex.getCause().getMessage());
+                    ex.printStackTrace();
+                }
             }
         };
         worker.execute();

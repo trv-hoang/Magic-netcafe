@@ -80,11 +80,58 @@ public class UserDAO {
     }
 
     public void delete(int userId) throws SQLException {
-        String sql = "DELETE FROM users WHERE id = ?";
-        try (Connection conn = DBPool.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
-            stmt.executeUpdate();
+        try (Connection conn = DBPool.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                // Delete related records first (order matters due to foreign keys)
+                // 1. orders
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM orders WHERE user_id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.executeUpdate();
+                }
+                // 3. sessions
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM sessions WHERE user_id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.executeUpdate();
+                }
+                // 4. topups
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM topups WHERE user_id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.executeUpdate();
+                }
+                // 5. topup_requests
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM topup_requests WHERE user_id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.executeUpdate();
+                }
+                // 6. messages (user can be sender or receiver)
+                try (PreparedStatement stmt = conn
+                        .prepareStatement("DELETE FROM messages WHERE sender_id = ? OR receiver_id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.setInt(2, userId);
+                    stmt.executeUpdate();
+                }
+                // 7. maintenance_requests
+                try (PreparedStatement stmt = conn
+                        .prepareStatement("DELETE FROM maintenance_requests WHERE user_id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.executeUpdate();
+                }
+                // 8. accounts
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM accounts WHERE user_id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.executeUpdate();
+                }
+                // Finally delete the user
+                try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM users WHERE id = ?")) {
+                    stmt.setInt(1, userId);
+                    stmt.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
         }
     }
 
