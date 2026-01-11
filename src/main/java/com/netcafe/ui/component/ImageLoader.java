@@ -12,7 +12,7 @@ public class ImageLoader {
 
     /**
      * Loads an image from resources or dev directory, scales it, and returns the
-     * icon.
+     * icon. Tries .png first, then .jpg as fallback.
      * 
      * @param name      The name of the image (without extension)
      * @param maxWidth  Maximum width for scaling
@@ -20,7 +20,12 @@ public class ImageLoader {
      * @return ImageIcon or null if not found
      */
     public static ImageIcon loadImage(String name, int maxWidth, int maxHeight) {
-        return loadImage(name, ".jpg", maxWidth, maxHeight);
+        // Try .png first (new square images), then .jpg as fallback
+        ImageIcon icon = loadImage(name, ".png", maxWidth, maxHeight);
+        if (icon == null) {
+            icon = loadImage(name, ".jpg", maxWidth, maxHeight);
+        }
+        return icon;
     }
 
     /**
@@ -41,7 +46,7 @@ public class ImageLoader {
             }
         }
 
-        if (icon != null) {
+        if (icon != null && icon.getIconWidth() > 0) {
             return scaleImage(icon, maxWidth, maxHeight);
         }
         return null;
