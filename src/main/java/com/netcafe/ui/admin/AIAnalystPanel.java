@@ -34,19 +34,16 @@ public class AIAnalystPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(BG_COLOR);
 
-        // Split Pane: Chat (Left) vs Chart (Right)
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setResizeWeight(0.35); // 35% Chat, 65% Chart
+        splitPane.setResizeWeight(0.35); 
         splitPane.setDividerSize(5);
         splitPane.setBorder(null);
 
-        // --- 1. Chat Panel Setup ---
         JPanel chatPanel = new JPanel(new BorderLayout());
         chatPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)), "Trợ lý ảo Jarvis"));
         chatPanel.setBackground(BG_COLOR);
 
-        // Cấu hình vùng hiển thị Chat (Style mới)
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
@@ -59,19 +56,16 @@ public class AIAnalystPanel extends JPanel {
         scrollPane.setBorder(null);
         chatPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Panel chứa Input và các nút Quick Option
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(BG_COLOR);
 
-        // A. Quick Options (3 nút chức năng bạn yêu cầu)
         JPanel quickOptionsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
         quickOptionsPanel.setBackground(BG_COLOR);
         
-        JButton btnRevenue = createStyledButton("💰 Doanh thu", new Color(46, 204, 113));
-        JButton btnTopProduct = createStyledButton("🍔 Top Món", new Color(230, 126, 34));
-        JButton btnTopUser = createStyledButton("🏆 Top User", new Color(52, 152, 219));
+        JButton btnRevenue = createStyledButton("Doanh thu", new Color(46, 204, 113));
+        JButton btnTopProduct = createStyledButton("Top Món", new Color(230, 126, 34));
+        JButton btnTopUser = createStyledButton("Top User", new Color(52, 152, 219));
 
-        // Sự kiện cho các nút
         btnRevenue.addActionListener(e -> handleQuickAction("REVENUE"));
         btnTopProduct.addActionListener(e -> handleQuickAction("TOP_PRODUCT"));
         btnTopUser.addActionListener(e -> handleQuickAction("TOP_USER"));
@@ -80,7 +74,6 @@ public class AIAnalystPanel extends JPanel {
         quickOptionsPanel.add(btnTopProduct);
         quickOptionsPanel.add(btnTopUser);
 
-        // B. Input Area
         JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
         inputPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         inputPanel.setBackground(BG_COLOR);
@@ -107,7 +100,6 @@ public class AIAnalystPanel extends JPanel {
         
         chatPanel.add(bottomPanel, BorderLayout.SOUTH);
 
-        // --- 2. Chart Panel Setup ---
         chartContainer.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)), "Biểu đồ phân tích"));
         chartContainer.setBackground(Color.WHITE);
@@ -123,7 +115,6 @@ public class AIAnalystPanel extends JPanel {
         appendChat("Jarvis: Xin chào Admin. Tôi có thể giúp gì cho bạn hôm nay?");
     }
 
-    // --- Xử lý các nút bấm nhanh (Quick Actions) ---
     private void handleQuickAction(String actionType) {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
@@ -137,14 +128,14 @@ public class AIAnalystPanel extends JPanel {
                     
                     } else if (actionType.equals("TOP_PRODUCT")) {
                         // 2. Top Món ăn (Bar Chart)
-                        DefaultCategoryDataset dataset = analyticsService.getTopProductsData(); // Bạn cần thêm hàm này ở Service
+                        DefaultCategoryDataset dataset = analyticsService.getTopProductsData(); 
                         appendChat("Jarvis: Đây là các món ăn bán chạy nhất trong ngày.");
                         updateChart("Top Món Ăn Bán Chạy", "Món", "Số lượng", dataset, "BAR");
                     
                     } else if (actionType.equals("TOP_USER")) {
                         // 3. Top User & Số lượng User mới
-                        DefaultCategoryDataset dataset = analyticsService.getTopUsersData(); // Bạn cần thêm hàm này ở Service
-                        int newUserCount = analyticsService.getNewUserCountToday(); // Bạn cần thêm hàm này ở Service
+                        DefaultCategoryDataset dataset = analyticsService.getTopUsersData();
+                        int newUserCount = analyticsService.getNewUserCountToday();
                         
                         appendChat("Jarvis: Có " + newUserCount + " tài khoản khách hàng mới được tạo hôm nay.");
                         appendChat("Jarvis: Đang hiển thị Top khách hàng nạp tiền nhiều nhất.");
@@ -160,7 +151,6 @@ public class AIAnalystPanel extends JPanel {
         worker.execute();
     }
 
-    // --- Xử lý chat text thông thường ---
     private void processQuery() {
         String query = txtInput.getText().trim();
         if (query.isEmpty()) return;
@@ -168,12 +158,9 @@ public class AIAnalystPanel extends JPanel {
         appendChat("Admin: " + query);
         txtInput.setText("");
 
-        // Logic cũ của bạn (có thể giữ lại hoặc map các từ khóa vào handleQuickAction)
         SwingWorker<String, Void> worker = new SwingWorker<>() {
             @Override
             protected String doInBackground() throws Exception {
-                // ... (Logic regex cũ của bạn giữ nguyên ở đây nếu muốn) ...
-                // Demo fallback:
                 return aiService.getResponse(query);
             }
             @Override
@@ -187,28 +174,23 @@ public class AIAnalystPanel extends JPanel {
         worker.execute();
     }
 
-    // --- Hàm cập nhật biểu đồ đa năng (Line hoặc Bar) ---
     private void updateChart(String title, String categoryAxisLabel, String valueAxisLabel, 
                              DefaultCategoryDataset dataset, String type) {
         SwingUtilities.invokeLater(() -> {
             JFreeChart chart;
 
             if ("BAR".equals(type)) {
-                // Tạo Bar Chart cho Top User / Top Món
                 chart = ChartFactory.createBarChart(
                         title, categoryAxisLabel, valueAxisLabel,
                         dataset, PlotOrientation.VERTICAL, true, true, false);
                 
-                // Tùy chỉnh Bar Chart cho đẹp (Flat Design)
                 CategoryPlot plot = chart.getCategoryPlot();
                 plot.setBackgroundPaint(Color.WHITE);
                 plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
                 BarRenderer renderer = (BarRenderer) plot.getRenderer();
-                renderer.setBarPainter(new StandardBarPainter()); // Bỏ hiệu ứng bóng 3D
-                renderer.setSeriesPaint(0, new Color(52, 152, 219)); // Màu cột xanh đẹp
-
+                renderer.setBarPainter(new StandardBarPainter()); 
+                renderer.setSeriesPaint(0, new Color(52, 152, 219)); 
             } else {
-                // Mặc định là Line Chart cho Doanh thu
                 chart = ChartFactory.createLineChart(
                         title, categoryAxisLabel, valueAxisLabel,
                         dataset, PlotOrientation.VERTICAL, true, true, false);
@@ -216,10 +198,9 @@ public class AIAnalystPanel extends JPanel {
                 CategoryPlot plot = chart.getCategoryPlot();
                 plot.setBackgroundPaint(Color.WHITE);
                 plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
-               plot.getRenderer().setSeriesPaint(0, new Color(41, 128, 185)); // Xanh dương đậm (Thực tế)
-    plot.getRenderer().setSeriesPaint(1, new Color(230, 126, 34)); // Cam (Dự báo)
+               plot.getRenderer().setSeriesPaint(0, new Color(41, 128, 185)); 
+    plot.getRenderer().setSeriesPaint(1, new Color(230, 126, 34)); 
                 
-    // (Tùy chọn) Làm nét đường, thêm marker
     plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.5f));
     plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{5, 3}, 0));
     
@@ -242,7 +223,6 @@ public class AIAnalystPanel extends JPanel {
         });
     }
 
-    // Helper tạo nút đẹp
     private JButton createStyledButton(String text, Color bgColor) {
         JButton btn = new JButton(text);
         btn.setBackground(bgColor);

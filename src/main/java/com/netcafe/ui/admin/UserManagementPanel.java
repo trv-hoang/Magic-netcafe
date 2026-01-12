@@ -5,6 +5,7 @@ import com.netcafe.service.BillingService;
 import com.netcafe.service.UserService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -22,6 +23,11 @@ public class UserManagementPanel extends JPanel {
         JTable table = new JTable(userModel);
         table.setRowHeight(30);
         table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
         add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

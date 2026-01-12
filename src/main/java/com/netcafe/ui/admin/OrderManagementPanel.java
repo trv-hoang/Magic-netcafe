@@ -6,8 +6,10 @@ import com.netcafe.model.Product;
 import com.netcafe.service.ProductService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class OrderManagementPanel extends JPanel {
@@ -37,6 +39,12 @@ public class OrderManagementPanel extends JPanel {
 
         JTable table = new JTable(productModel);
         table.setRowHeight(25);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -100,6 +108,17 @@ public class OrderManagementPanel extends JPanel {
         JTable table = new JTable(orderModel);
         table.setRowHeight(30);
         table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
+        // ➤➤➤ CĂN GIỮA CÁC CỘT MONG MUỐN
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer); // ID
+        table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer); // User
+        table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer); // Product
+        table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer); // Qty
+        table.getColumnModel().getColumn(4).setCellRenderer(centerRenderer); // Total
+        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer); // Status
+        table.getColumnModel().getColumn(6).setCellRenderer(centerRenderer); // Date
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -235,9 +254,27 @@ public class OrderManagementPanel extends JPanel {
                 try {
                     List<Order> list = get();
                     orderModel.setRowCount(0);
-                    for (Order o : list)
-                        orderModel.addRow(new Object[] { o.getId(), o.getUserId(), o.getProductId(), o.getQty(),
-                                o.getTotalPrice(), o.getStatus() });
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    for (Order o : list) {
+                        String productName = productService
+                                .getProductById(o.getProductId())
+                                .map(Product::getName)
+                                .orElse("Unknown");
+                        String formattedDate = "";
+                        if (o.getCreatedAt() != null) {
+                            formattedDate = o.getCreatedAt().format(formatter);
+                        }
+                        orderModel.addRow(new Object[] {
+                                o.getId(),
+                                o.getUserId(),
+                                productName,
+                                o.getQty(),
+                                o.getTotalPrice(),
+                                o.getStatus(),
+                                formattedDate
+                        });
+                    }
+
                 } catch (Exception ex) {
                     com.netcafe.util.SwingUtils.showError(OrderManagementPanel.this, "Error loading orders", ex);
                 }
