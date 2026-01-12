@@ -200,6 +200,23 @@ public class BillingService {
         }
     }
 
+    public void deductBalance(int userId, long amount) throws Exception {
+        if (amount <= 0)
+            return;
+        try (Connection conn = DBPool.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                Account acc = accountDAO.getAccountForUpdate(conn, userId);
+                long newBalance = Math.max(0, acc.getBalance() - amount);
+                accountDAO.updateBalance(conn, userId, newBalance);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        }
+    }
+
     public void redeemPoints(int userId, int pointsToRedeem) throws Exception {
         if (pointsToRedeem <= 0)
             return;
