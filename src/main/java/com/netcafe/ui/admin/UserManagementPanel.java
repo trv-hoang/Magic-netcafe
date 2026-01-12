@@ -14,7 +14,12 @@ public class UserManagementPanel extends JPanel {
     private final UserService userService = new UserService();
     private final BillingService billingService = new BillingService();
     private final DefaultTableModel userModel = new DefaultTableModel(
-            new String[] { "ID", "Username", "Full Name", "Role", "Tier", "Balance", "Points" }, 0);
+            new String[] { "ID", "Username", "Full Name", "Role", "Tier", "Balance", "Points" }, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
 
     public UserManagementPanel() {
         setLayout(new BorderLayout());
@@ -128,6 +133,10 @@ public class UserManagementPanel extends JPanel {
         });
 
         loadUsers(User.Role.USER, userModel);
+
+        // Auto-refresh every 10 seconds to show balance changes
+        javax.swing.Timer refreshTimer = new javax.swing.Timer(5000, e -> loadUsers(User.Role.USER, userModel));
+        refreshTimer.start();
     }
 
     private void createUser(User.Role role, DefaultTableModel model) {

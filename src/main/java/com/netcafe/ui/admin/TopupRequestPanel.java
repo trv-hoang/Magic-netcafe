@@ -12,7 +12,12 @@ import java.util.List;
 public class TopupRequestPanel extends JPanel {
     private final BillingService billingService = new BillingService();
     private final DefaultTableModel topupModel = new DefaultTableModel(
-            new String[] { "ID", "User ID", "Amount", "Status" }, 0);
+            new String[] { "ID", "User ID", "Amount", "Status" }, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
 
     public TopupRequestPanel() {
         setLayout(new BorderLayout());
@@ -51,6 +56,10 @@ public class TopupRequestPanel extends JPanel {
         });
 
         loadTopupRequests();
+
+        // Auto-refresh every 5 seconds
+        javax.swing.Timer refreshTimer = new javax.swing.Timer(5000, e -> loadTopupRequests());
+        refreshTimer.start();
     }
 
     private void loadTopupRequests() {

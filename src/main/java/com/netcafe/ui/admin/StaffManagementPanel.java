@@ -11,7 +11,12 @@ import java.util.List;
 public class StaffManagementPanel extends JPanel {
     private final UserService userService = new UserService();
     private final DefaultTableModel staffModel = new DefaultTableModel(
-            new String[] { "ID", "Username", "Full Name", "Role" }, 0);
+            new String[] { "ID", "Username", "Full Name", "Role" }, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
 
     public StaffManagementPanel() {
         setLayout(new BorderLayout());

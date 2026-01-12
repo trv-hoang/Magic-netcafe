@@ -17,9 +17,19 @@ public class OrderManagementPanel extends JPanel {
     private final OrderDAO orderDAO = new OrderDAO();
 
     private final DefaultTableModel productModel = new DefaultTableModel(
-            new String[] { "ID", "Name", "Category", "Price", "Stock" }, 0);
+            new String[] { "ID", "Name", "Category", "Price", "Stock" }, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
     private final DefaultTableModel orderModel = new DefaultTableModel(
-            new String[] { "ID", "User", "Product", "Qty", "Total", "Status", "Date" }, 0);
+            new String[] { "ID", "User", "Product", "Qty", "Total", "Status", "Date" }, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
 
     public OrderManagementPanel() {
         setLayout(new BorderLayout());
@@ -159,6 +169,11 @@ public class OrderManagementPanel extends JPanel {
         });
 
         loadOrders();
+
+        // Auto-refresh orders every 5 seconds
+        javax.swing.Timer refreshTimer = new javax.swing.Timer(5000, e -> loadOrders());
+        refreshTimer.start();
+
         return panel;
     }
 
