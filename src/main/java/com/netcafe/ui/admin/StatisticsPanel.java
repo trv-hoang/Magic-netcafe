@@ -5,16 +5,20 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
 
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -28,35 +32,45 @@ public class StatisticsPanel extends JPanel {
     }
 
     private void initUI() {
-        // Layout 2x2: 4 ô
-        setLayout(new GridLayout(2, 2, 20, 20));
+        // SỬ DỤNG BORDER LAYOUT ĐỂ TỐI ƯU KHÔNG GIAN
+        setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        setBackground(new Color(245, 247, 250)); // Màu nền xám nhẹ hiện đại
+        setBackground(new Color(245, 247, 250));
 
-        // 1. Biểu đồ Đường (Doanh thu)
-        add(createRevenueLineChart());
+        // --- KHU VỰC TRUNG TÂM: CHỨA 4 BIỂU ĐỒ (GRID 2x2) ---
+        JPanel chartsContainer = new JPanel(new GridLayout(2, 2, 20, 20));
+        chartsContainer.setOpaque(false); // Để lộ màu nền của panel cha
 
-        // 2. Biểu đồ Cột Ngang (Top Món)
-        add(createBarChart("TOP MÓN ĂN BÁN CHẠY", "Món", "Số lượng", 2));
+        // 1. Line Chart (Xu hướng Doanh thu)
+        chartsContainer.add(createRevenueLineChart());
 
-        // 3. Biểu đồ Cột Đứng (Top User)
-        add(createBarChart("TOP USER NẠP TIỀN", "User", "VND", 3));
+        // 2. Bar Chart (Top Món ăn)
+        chartsContainer.add(createBarChart("TOP MÓN ĂN BÁN CHẠY", "Món", "Số lượng", 2));
 
-        // 4. Panel Chức năng
-        JPanel controlPanel = new JPanel(new GridBagLayout());
-        controlPanel.setBackground(new Color(245, 247, 250));
-        
+        // 3. Bar Chart (Top User)
+        chartsContainer.add(createBarChart("TOP USER NẠP TIỀN", "User", "VND", 3));
+
+        // 4. Pie Chart (Cơ cấu Doanh thu)
+        chartsContainer.add(createRevenueStructurePieChart());
+
+        add(chartsContainer, BorderLayout.CENTER);
+
+        // --- KHU VỰC DƯỚI CÙNG: NÚT CHỨC NĂNG ---
+        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        controlPanel.setOpaque(false);
+
         JButton btnRefresh = new JButton("Cập nhật dữ liệu");
         btnRefresh.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnRefresh.setBackground(new Color(0, 123, 255)); // Màu xanh nút Bootstrap
+        btnRefresh.setBackground(new Color(0, 123, 255));
         btnRefresh.setForeground(Color.WHITE);
         btnRefresh.setFocusPainted(false);
-        btnRefresh.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnRefresh.setPreferredSize(new Dimension(180, 40));
         btnRefresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
+
         btnRefresh.addActionListener(e -> refreshData());
         controlPanel.add(btnRefresh);
-        add(controlPanel);
+
+        add(controlPanel, BorderLayout.SOUTH);
     }
 
     // --- CHART 1: LINE CHART (ĐƯỜNG) ---
@@ -69,30 +83,28 @@ public class StatisticsPanel extends JPanel {
         }
 
         JFreeChart lineChart = ChartFactory.createLineChart(
-                "XU HƯỚNG DOANH THU", // Title
-                "Tháng",             // X-Axis Label
-                "Doanh thu (VND)",   // Y-Axis Label
-                dataset,
-                PlotOrientation.VERTICAL,
-                true, true, false
+                "XU HƯỚNG DOANH THU", "Tháng", "Doanh thu (VND)",
+                dataset, PlotOrientation.VERTICAL, true, true, false
         );
 
-        // Style cho biểu đồ đường
         CategoryPlot plot = lineChart.getCategoryPlot();
         plot.setBackgroundPaint(Color.WHITE);
-        plot.setRangeGridlinePaint(new Color(220, 220, 220)); // Lưới màu xám nhạt
-        
-        // Chỉnh đường kẻ (Line) và điểm (Dot)
+        plot.setRangeGridlinePaint(new Color(220, 220, 220));
+
         LineAndShapeRenderer renderer = new LineAndShapeRenderer();
-        renderer.setSeriesPaint(0, new Color(255, 99, 71)); // Màu cà chua (Tomato)
-        renderer.setSeriesStroke(0, new BasicStroke(3.0f)); // Đường dày 3px
-        renderer.setSeriesShapesVisible(0, true); // Hiện chấm tròn tại các điểm
+        renderer.setSeriesPaint(0, new Color(255, 99, 71));
+        renderer.setSeriesStroke(0, new BasicStroke(3.0f));
+        renderer.setSeriesShapesVisible(0, true);
         plot.setRenderer(renderer);
+
+        // Format trục Y tiền tệ
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setNumberFormatOverride(NumberFormat.getNumberInstance(Locale.US));
 
         return new ChartPanel(lineChart);
     }
 
-    // --- CHART 2 & 3: BAR CHART (CỘT 2D PHẲNG) ---
+    // --- CHART 2 & 3: BAR CHART (CỘT) ---
     private ChartPanel createBarChart(String title, String xLabel, String yLabel, int type) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         try {
@@ -104,7 +116,6 @@ public class StatisticsPanel extends JPanel {
 
         PlotOrientation orientation = (type == 2) ? PlotOrientation.HORIZONTAL : PlotOrientation.VERTICAL;
 
-        // Dùng createBarChart thay vì createBarChart3D để tránh lỗi
         JFreeChart chart = ChartFactory.createBarChart(
                 title, xLabel, yLabel,
                 dataset, orientation, false, true, false
@@ -114,21 +125,60 @@ public class StatisticsPanel extends JPanel {
         plot.setBackgroundPaint(Color.WHITE);
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
 
-        // Tùy chỉnh màu sắc cột cho đẹp (Flat Design)
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setBarPainter(new StandardBarPainter()); // Tắt hiệu ứng bóng (Gradient) để phẳng đẹp
-        
+        renderer.setBarPainter(new StandardBarPainter());
+
         if (type == 2) {
-            renderer.setSeriesPaint(0, new Color(40, 167, 69)); // Màu xanh lá (Top Món)
+            renderer.setSeriesPaint(0, new Color(40, 167, 69)); // Xanh lá
         } else {
-            renderer.setSeriesPaint(0, new Color(23, 162, 184)); // Màu xanh Cyan (Top User)
+            renderer.setSeriesPaint(0, new Color(23, 162, 184)); // Xanh Cyan
         }
 
-        // Định dạng số trên trục Y (ví dụ: 1,000,000)
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setNumberFormatOverride(NumberFormat.getNumberInstance(Locale.US));
 
         return new ChartPanel(chart);
+    }
+
+    // --- CHART 4: PIE CHART (TRÒN) - MỚI ---
+    private ChartPanel createRevenueStructurePieChart() {
+        // [QUAN TRỌNG] Đã thêm <String> để khớp với StatisticsDAO
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+        try {
+            dataset = statsDAO.getRevenueStructure();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        JFreeChart pieChart = ChartFactory.createPieChart(
+                "CƠ CẤU DOANH THU TRONG THÁNG", // Tiêu đề
+                dataset,            // Dữ liệu
+                true,               // Legend (Chú thích)
+                true,
+                false
+        );
+
+        // Tùy chỉnh giao diện Pie Chart
+        PiePlot<String> plot = (PiePlot<String>) pieChart.getPlot();
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setOutlineVisible(false); // Bỏ viền bao quanh
+
+        // Màu sắc cho các phần (Section)
+        plot.setSectionPaint("Dịch vụ (Đồ ăn/Uống)", new Color(255, 193, 7)); // Màu Vàng
+        plot.setSectionPaint("Giờ chơi (Nạp tiền)", new Color(0, 123, 255));  // Màu Xanh Dương
+        plot.setSectionPaint("Chưa có dữ liệu", Color.LIGHT_GRAY);
+
+        // Hiển thị Label
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
+                "{0} : {1} ({2})",
+                new DecimalFormat("#,##0 VND"),
+                new DecimalFormat("0%")
+        ));
+
+        plot.setLabelFont(new Font("Segoe UI", Font.PLAIN, 11));
+        plot.setLabelBackgroundPaint(new Color(255, 255, 255, 200));
+
+        return new ChartPanel(pieChart);
     }
 
     public void refreshData() {
