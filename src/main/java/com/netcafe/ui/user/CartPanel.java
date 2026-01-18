@@ -309,7 +309,12 @@ public class CartPanel extends JPanel {
                         refreshCart();
                         onCheckoutSuccess.run();
                     } catch (Exception ex) {
-                        SwingUtils.showError(CartPanel.this, "Payment failed", ex);
+                        // Extract user-friendly message from exception
+                        String errorMsg = ex.getMessage();
+                        if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                            errorMsg = ex.getCause().getMessage();
+                        }
+                        SwingUtils.showError(CartPanel.this, errorMsg != null ? errorMsg : "Payment failed");
                     }
                 }
             };
