@@ -149,38 +149,30 @@ UPDATE accounts SET balance = 50000 WHERE user_id = (SELECT id FROM users WHERE 
 
 -- 3. Tạo Menu Đồ ăn / Nước uống (Full Menu)
 INSERT INTO products (name, category, price, stock) VALUES 
-('Sting Dau', 'DRINK', 12000, 200),
-('Sting Vang', 'DRINK', 12000, 200),
-('Coca Cola', 'DRINK', 10000, 200),
+('Banh Mi', 'FOOD', 20000, 100),
+('Com Rang', 'FOOD', 35000, 100),
+('Bo Kho', 'FOOD', 40000, 100),
+('Bun Rieu', 'FOOD', 30000, 100),
+('My Trung', 'FOOD', 25000, 100),
+('Pho Bo', 'FOOD', 45000, 50),
+('Bun Cha', 'FOOD', 40000, 50),
+('Com Tam', 'FOOD', 35000, 50),
+('Goi Cuon', 'FOOD', 15000, 100),
+('Nem Ran', 'FOOD', 20000, 100),
+('CocaCola', 'DRINK', 10000, 200),
 ('Pepsi', 'DRINK', 10000, 200),
-('7Up', 'DRINK', 10000, 200),
-('Redbull', 'DRINK', 15000, 100),
-('Number 1', 'DRINK', 12000, 100),
-('Tra Xanh 0 Do', 'DRINK', 10000, 150),
-('C2', 'DRINK', 8000, 150),
-('Nuoc Suoi', 'DRINK', 5000, 500),
-('Tra Da', 'DRINK', 2000, 1000),
-('Ca Phe Den', 'DRINK', 15000, 50),
-('Ca Phe Sua', 'DRINK', 20000, 50),
-('Bac Xiu', 'DRINK', 25000, 50),
-('My Tom Trung', 'FOOD', 15000, 100),
-('My Tom Xuc Xich', 'FOOD', 20000, 100),
-('My Tom Full Topping', 'FOOD', 30000, 100),
-('Banh Mi Pate', 'FOOD', 15000, 50),
-('Banh Mi Trung', 'FOOD', 15000, 50),
-('Banh Mi Thap Cam', 'FOOD', 25000, 50),
-('Com Rang Dua Bo', 'FOOD', 35000, 50),
-('Com Rang Thap Cam', 'FOOD', 30000, 50),
-('Com Ga Xoi Mo', 'FOOD', 40000, 50),
-('Kho Ga La Chanh', 'FOOD', 20000, 100),
-('Bim Bim Oishi', 'FOOD', 5000, 200);
+('Sprite', 'DRINK', 10000, 200),
+('Bo Huc', 'DRINK', 15000, 200),
+('Sting', 'DRINK', 12000, 200),
+('Tra Da', 'DRINK', 5000, 500),
+('Ca Phe Sua Da', 'DRINK', 25000, 100);
 
 -- 4. Tạo Máy tính (20 PC - Full Phòng)
 INSERT INTO computers (name, status, x_pos, y_pos) VALUES
 ('MAY-01', 'AVAILABLE', 0, 0), ('MAY-02', 'AVAILABLE', 1, 0), ('MAY-03', 'AVAILABLE', 2, 0), ('MAY-04', 'AVAILABLE', 3, 0), ('MAY-05', 'AVAILABLE', 4, 0),
-('MAY-06', 'OCCUPIED',  0, 1), ('MAY-07', 'AVAILABLE', 1, 1), ('MAY-08', 'AVAILABLE', 2, 1), ('MAY-09', 'AVAILABLE', 3, 1), ('MAY-10', 'AVAILABLE', 4, 1),
-('MAY-11', 'AVAILABLE', 0, 2), ('MAY-12', 'MAINTENANCE', 1, 2), ('MAY-13', 'AVAILABLE', 2, 2), ('MAY-14', 'AVAILABLE', 3, 2), ('MAY-15', 'AVAILABLE', 4, 2),
-('MAY-16', 'AVAILABLE', 0, 3), ('MAY-17', 'AVAILABLE', 1, 3), ('MAY-18', 'AVAILABLE', 2, 3), ('MAY-19', 'AVAILABLE', 3, 3), ('MAY-20', 'DIRTY', 4, 3);
+('MAY-06', 'AVAILABLE', 0, 1), ('MAY-07', 'AVAILABLE', 1, 1), ('MAY-08', 'AVAILABLE', 2, 1), ('MAY-09', 'AVAILABLE', 3, 1), ('MAY-10', 'AVAILABLE', 4, 1),
+('MAY-11', 'AVAILABLE', 0, 2), ('MAY-12', 'AVAILABLE', 1, 2), ('MAY-13', 'AVAILABLE', 2, 2), ('MAY-14', 'AVAILABLE', 3, 2), ('MAY-15', 'AVAILABLE', 4, 2),
+('MAY-16', 'AVAILABLE', 0, 3), ('MAY-17', 'AVAILABLE', 1, 3), ('MAY-18', 'AVAILABLE', 2, 3), ('MAY-19', 'AVAILABLE', 3, 3), ('MAY-20', 'AVAILABLE', 4, 3);
 
 -- ================================================================
 -- PHẦN 4: GIẢ LẬP DỮ LIỆU THỐNG KÊ (12 THÁNG NĂM 2025)
@@ -253,53 +245,53 @@ INSERT INTO topup_requests (user_id, amount, status, created_at) VALUES
 
 -- Tháng 1
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='yasuo_gank_tem'), (SELECT id FROM products WHERE name='Sting Dau'), 2, 24000, 'SERVED', '2025-01-05 09:30:00');
+((SELECT id FROM users WHERE username='yasuo_gank_tem'), (SELECT id FROM products WHERE name='Sting'), 2, 24000, 'SERVED', '2025-01-05 09:30:00');
 
 -- Tháng 2
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='Com Ga Xoi Mo'), 5, 200000, 'SERVED', '2025-02-10 12:00:00'),
-((SELECT id FROM users WHERE username='tuan_tien_ti'), (SELECT id FROM products WHERE name='Sting Vang'), 10, 120000, 'SERVED', '2025-02-12 14:00:00');
+((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='Com Rang'), 5, 175000, 'SERVED', '2025-02-10 12:00:00'),
+((SELECT id FROM users WHERE username='tuan_tien_ti'), (SELECT id FROM products WHERE name='Sting'), 10, 120000, 'SERVED', '2025-02-12 14:00:00');
 
 -- Tháng 3
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='thanh_trung_sk'), (SELECT id FROM products WHERE name='My Tom Trung'), 2, 30000, 'SERVED', '2025-03-05 19:00:00');
+((SELECT id FROM users WHERE username='thanh_trung_sk'), (SELECT id FROM products WHERE name='My Trung'), 2, 50000, 'SERVED', '2025-03-05 19:00:00');
 
 -- Tháng 4
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='Com Rang Dua Bo'), 2, 70000, 'SERVED', '2025-04-30 12:30:00');
+((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='Com Tam'), 2, 70000, 'SERVED', '2025-04-30 12:30:00');
 
 -- Tháng 5
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='co_giao_thao'), (SELECT id FROM products WHERE name='Ca Phe Sua'), 2, 40000, 'SERVED', '2025-05-25 20:00:00');
+((SELECT id FROM users WHERE username='co_giao_thao'), (SELECT id FROM products WHERE name='Ca Phe Sua Da'), 2, 50000, 'SERVED', '2025-05-25 20:00:00');
 
 -- Tháng 6 (Hè nóng nực - Bán nước siêu chạy)
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='Sting Dau'), 20, 240000, 'SERVED', '2025-06-01 10:00:00'),
+((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='Sting'), 20, 240000, 'SERVED', '2025-06-01 10:00:00'),
 ((SELECT id FROM users WHERE username='tuan_tien_ti'), (SELECT id FROM products WHERE name='Pepsi'), 15, 150000, 'SERVED', '2025-06-10 15:00:00'),
-((SELECT id FROM users WHERE username='vua_tro_choi'), (SELECT id FROM products WHERE name='Banh Mi Thap Cam'), 5, 125000, 'SERVED', '2025-06-20 12:00:00');
+((SELECT id FROM users WHERE username='vua_tro_choi'), (SELECT id FROM products WHERE name='Banh Mi'), 5, 100000, 'SERVED', '2025-06-20 12:00:00');
 
 -- Tháng 7
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='thanh_trung_sk'), (SELECT id FROM products WHERE name='My Tom Full Topping'), 3, 90000, 'SERVED', '2025-07-05 11:00:00'),
-((SELECT id FROM users WHERE username='yasuo_gank_tem'), (SELECT id FROM products WHERE name='Tra Da'), 10, 20000, 'SERVED', '2025-07-25 15:00:00');
+((SELECT id FROM users WHERE username='thanh_trung_sk'), (SELECT id FROM products WHERE name='Pho Bo'), 3, 135000, 'SERVED', '2025-07-05 11:00:00'),
+((SELECT id FROM users WHERE username='yasuo_gank_tem'), (SELECT id FROM products WHERE name='Tra Da'), 10, 50000, 'SERVED', '2025-07-25 15:00:00');
 
 -- Tháng 8
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='meo_simmy_fake'), (SELECT id FROM products WHERE name='Bim Bim Oishi'), 5, 25000, 'SERVED', '2025-08-15 09:30:00');
+((SELECT id FROM users WHERE username='meo_simmy_fake'), (SELECT id FROM products WHERE name='Goi Cuon'), 5, 75000, 'SERVED', '2025-08-15 09:30:00');
 
 -- Tháng 9
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='best_leesin'), (SELECT id FROM products WHERE name='Sting Vang'), 2, 24000, 'SERVED', '2025-09-20 20:00:00');
+((SELECT id FROM users WHERE username='best_leesin'), (SELECT id FROM products WHERE name='CocaCola'), 2, 20000, 'SERVED', '2025-09-20 20:00:00');
 
 -- Tháng 10
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='hacker_lor'), (SELECT id FROM products WHERE name='Ca Phe Den'), 1, 15000, 'SERVED', '2025-10-10 20:30:00');
+((SELECT id FROM users WHERE username='hacker_lor'), (SELECT id FROM products WHERE name='Bo Huc'), 1, 15000, 'SERVED', '2025-10-10 20:30:00');
 
 -- Tháng 11
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='tuan_tien_ti'), (SELECT id FROM products WHERE name='Banh Mi Pate'), 2, 30000, 'SERVED', '2025-11-20 18:00:00');
+((SELECT id FROM users WHERE username='tuan_tien_ti'), (SELECT id FROM products WHERE name='Nem Ran'), 2, 40000, 'SERVED', '2025-11-20 18:00:00');
 
--- Tháng 12 (Lạnh - Bán mỳ tôm chạy)
+-- Tháng 12 (Lạnh - Bán đồ ăn chạy)
 INSERT INTO orders (user_id, product_id, qty, total_price, status, created_at) VALUES 
-((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='My Tom Full Topping'), 10, 300000, 'SERVED', '2025-12-24 20:00:00'),
-((SELECT id FROM users WHERE username='vua_tro_choi'), (SELECT id FROM products WHERE name='Redbull'), 5, 75000, 'SERVED', '2025-12-31 23:00:00');
+((SELECT id FROM users WHERE username='boy_nha_giau'), (SELECT id FROM products WHERE name='Bun Rieu'), 10, 300000, 'SERVED', '2025-12-24 20:00:00'),
+((SELECT id FROM users WHERE username='vua_tro_choi'), (SELECT id FROM products WHERE name='Bo Kho'), 2, 80000, 'SERVED', '2025-12-31 23:00:00');
