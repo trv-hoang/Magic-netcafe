@@ -1,6 +1,7 @@
 package com.netcafe.ui.admin;
 
 import com.netcafe.dao.StatisticsDAO;
+import com.netcafe.ui.component.StyledButton;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -32,38 +33,34 @@ public class StatisticsPanel extends JPanel {
     }
 
     private void initUI() {
-        // SỬ DỤNG BORDER LAYOUT ĐỂ TỐI ƯU KHÔNG GIAN
+        // USE BORDER LAYOUT TO OPTIMIZE SPACE
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         setBackground(new Color(245, 247, 250));
 
-        // --- KHU VỰC TRUNG TÂM: CHỨA 4 BIỂU ĐỒ (GRID 2x2) ---
+        // --- CENTER AREA: CONTAINS 4 CHARTS (GRID 2x2) ---
         JPanel chartsContainer = new JPanel(new GridLayout(2, 2, 20, 20));
-        chartsContainer.setOpaque(false); // Để lộ màu nền của panel cha
+        chartsContainer.setOpaque(false); // Expose parent panel background
 
-        // 1. Line Chart (Xu hướng Doanh thu)
+        // 1. Line Chart (Revenue Trend)
         chartsContainer.add(createRevenueLineChart());
 
-        // 2. Bar Chart (Top Món ăn)
-        chartsContainer.add(createBarChart("TOP MÓN ĂN BÁN CHẠY", "Món", "Số lượng", 2));
+        // 2. Bar Chart (Top Products)
+        chartsContainer.add(createBarChart("TOP SELLING PRODUCTS", "Product", "Quantity", 2));
 
         // 3. Bar Chart (Top User)
-        chartsContainer.add(createBarChart("TOP USER NẠP TIỀN", "User", "VND", 3));
+        chartsContainer.add(createBarChart("TOP USERS BY TOP-UP", "User", "VND", 3));
 
-        // 4. Pie Chart (Cơ cấu Doanh thu)
+        // 4. Pie Chart (Revenue Structure)
         chartsContainer.add(createRevenueStructurePieChart());
 
         add(chartsContainer, BorderLayout.CENTER);
 
-        // --- KHU VỰC DƯỚI CÙNG: NÚT CHỨC NĂNG ---
+        // --- BOTTOM AREA: CONTROL BUTTONS ---
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         controlPanel.setOpaque(false);
 
-        JButton btnRefresh = new JButton("Cập nhật dữ liệu");
-        btnRefresh.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnRefresh.setBackground(new Color(0, 123, 255));
-        btnRefresh.setForeground(Color.WHITE);
-        btnRefresh.setFocusPainted(false);
+        JButton btnRefresh = StyledButton.primary("Refresh Data");
         btnRefresh.setPreferredSize(new Dimension(180, 40));
         btnRefresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -73,7 +70,7 @@ public class StatisticsPanel extends JPanel {
         add(controlPanel, BorderLayout.SOUTH);
     }
 
-    // --- CHART 1: LINE CHART (ĐƯỜNG) ---
+    // --- CHART 1: LINE CHART ---
     private ChartPanel createRevenueLineChart() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         try {
@@ -83,9 +80,8 @@ public class StatisticsPanel extends JPanel {
         }
 
         JFreeChart lineChart = ChartFactory.createLineChart(
-                "XU HƯỚNG DOANH THU", "Tháng", "Doanh thu (VND)",
-                dataset, PlotOrientation.VERTICAL, true, true, false
-        );
+                "REVENUE TREND", "Month", "Revenue (VND)",
+                dataset, PlotOrientation.VERTICAL, true, true, false);
 
         CategoryPlot plot = lineChart.getCategoryPlot();
         plot.setBackgroundPaint(Color.WHITE);
@@ -97,19 +93,21 @@ public class StatisticsPanel extends JPanel {
         renderer.setSeriesShapesVisible(0, true);
         plot.setRenderer(renderer);
 
-        // Format trục Y tiền tệ
+        // Format Y axis as currency
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setNumberFormatOverride(NumberFormat.getNumberInstance(Locale.US));
 
         return new ChartPanel(lineChart);
     }
 
-    // --- CHART 2 & 3: BAR CHART (CỘT) ---
+    // --- CHART 2 & 3: BAR CHART ---
     private ChartPanel createBarChart(String title, String xLabel, String yLabel, int type) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         try {
-            if (type == 2) dataset = statsDAO.getTopSellingProducts();
-            else if (type == 3) dataset = statsDAO.getTopSpenders();
+            if (type == 2)
+                dataset = statsDAO.getTopSellingProducts();
+            else if (type == 3)
+                dataset = statsDAO.getTopSpenders();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -118,8 +116,7 @@ public class StatisticsPanel extends JPanel {
 
         JFreeChart chart = ChartFactory.createBarChart(
                 title, xLabel, yLabel,
-                dataset, orientation, false, true, false
-        );
+                dataset, orientation, false, true, false);
 
         CategoryPlot plot = chart.getCategoryPlot();
         plot.setBackgroundPaint(Color.WHITE);
@@ -129,9 +126,9 @@ public class StatisticsPanel extends JPanel {
         renderer.setBarPainter(new StandardBarPainter());
 
         if (type == 2) {
-            renderer.setSeriesPaint(0, new Color(40, 167, 69)); // Xanh lá
+            renderer.setSeriesPaint(0, new Color(40, 167, 69)); // Green
         } else {
-            renderer.setSeriesPaint(0, new Color(23, 162, 184)); // Xanh Cyan
+            renderer.setSeriesPaint(0, new Color(23, 162, 184)); // Cyan
         }
 
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
@@ -140,9 +137,9 @@ public class StatisticsPanel extends JPanel {
         return new ChartPanel(chart);
     }
 
-    // --- CHART 4: PIE CHART (TRÒN) - MỚI ---
+    // --- CHART 4: PIE CHART - NEW ---
     private ChartPanel createRevenueStructurePieChart() {
-        // [QUAN TRỌNG] Đã thêm <String> để khớp với StatisticsDAO
+        // [IMPORTANT] Added <String> to match StatisticsDAO
         DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
         try {
             dataset = statsDAO.getRevenueStructure();
@@ -151,29 +148,27 @@ public class StatisticsPanel extends JPanel {
         }
 
         JFreeChart pieChart = ChartFactory.createPieChart(
-                "CƠ CẤU DOANH THU TRONG THÁNG", // Tiêu đề
-                dataset,            // Dữ liệu
-                true,               // Legend (Chú thích)
+                "MONTHLY REVENUE STRUCTURE", // Title
+                dataset, // Data
+                true, // Legend
                 true,
-                false
-        );
+                false);
 
-        // Tùy chỉnh giao diện Pie Chart
+        // Customize Pie Chart appearance
         PiePlot<String> plot = (PiePlot<String>) pieChart.getPlot();
         plot.setBackgroundPaint(Color.WHITE);
-        plot.setOutlineVisible(false); // Bỏ viền bao quanh
+        plot.setOutlineVisible(false); // Remove outline
 
-        // Màu sắc cho các phần (Section)
-        plot.setSectionPaint("Dịch vụ (Đồ ăn/Uống)", new Color(255, 193, 7)); // Màu Vàng
-        plot.setSectionPaint("Giờ chơi (Nạp tiền)", new Color(0, 123, 255));  // Màu Xanh Dương
-        plot.setSectionPaint("Chưa có dữ liệu", Color.LIGHT_GRAY);
+        // Colors for sections
+        plot.setSectionPaint("Services (Food/Drink)", new Color(255, 193, 7)); // Yellow
+        plot.setSectionPaint("Play Time (Top-up)", new Color(0, 123, 255)); // Blue
+        plot.setSectionPaint("No Data", Color.LIGHT_GRAY);
 
-        // Hiển thị Label
+        // Display Labels
         plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
                 "{0} : {1} ({2})",
                 new DecimalFormat("#,##0 VND"),
-                new DecimalFormat("0%")
-        ));
+                new DecimalFormat("0%")));
 
         plot.setLabelFont(new Font("Segoe UI", Font.PLAIN, 11));
         plot.setLabelBackgroundPaint(new Color(255, 255, 255, 200));

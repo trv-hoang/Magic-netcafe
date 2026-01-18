@@ -2,16 +2,16 @@ package com.netcafe.dao;
 
 import com.netcafe.util.DBPool;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset; // Chỉ giữ lại 1 dòng này
+import org.jfree.data.general.DefaultPieDataset; // Keep only this import
 import java.sql.*;
 
 public class StatisticsDAO {
 
-    // 1. Doanh thu 12 tháng gần nhất (Line Chart) - Đã cập nhật logic chuẩn
+    // 1. Revenue of last 12 months (Line Chart) - Updated with standard logic
     public DefaultCategoryDataset getMonthlyRevenue() throws SQLException {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        // SQL lấy 12 tháng gần nhất, hiển thị dạng mm/yyyy
+        // SQL gets last 12 months, displayed as mm/yyyy
         String sql = "SELECT DATE_FORMAT(created_at, '%m/%Y') as time_label, " +
                 "       YEAR(created_at) as y, " +
                 "       MONTH(created_at) as m, " +
@@ -32,17 +32,17 @@ public class StatisticsDAO {
             boolean hasData = false;
             while (rs.next()) {
                 hasData = true;
-                dataset.addValue(rs.getDouble("revenue"), "Tổng Doanh Thu", rs.getString("time_label"));
+                dataset.addValue(rs.getDouble("revenue"), "Total Revenue", rs.getString("time_label"));
             }
 
             if (!hasData) {
-                dataset.addValue(0, "Tổng Doanh Thu", "Hiện tại");
+                dataset.addValue(0, "Total Revenue", "Current");
             }
         }
         return dataset;
     }
 
-    // 2. Top Món ăn (Bar Chart)
+    // 2. Top Products (Bar Chart)
     public DefaultCategoryDataset getTopSellingProducts() throws SQLException {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         String sql = "SELECT p.name, SUM(o.qty) as total_qty FROM orders o " +
@@ -54,13 +54,13 @@ public class StatisticsDAO {
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                dataset.addValue(rs.getInt("total_qty"), "Số lượng", rs.getString("name"));
+                dataset.addValue(rs.getInt("total_qty"), "Quantity", rs.getString("name"));
             }
         }
         return dataset;
     }
 
-    // 3. Top User Nạp tiền (Bar Chart)
+    // 3. Top Users by Top-up (Bar Chart)
     public DefaultCategoryDataset getTopSpenders() throws SQLException {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -79,17 +79,17 @@ public class StatisticsDAO {
             boolean hasData = false;
             while (rs.next()) {
                 hasData = true;
-                dataset.addValue(rs.getDouble("total_topup"), "Số tiền nạp", rs.getString("username"));
+                dataset.addValue(rs.getDouble("total_topup"), "Top-up Amount", rs.getString("username"));
             }
             if (!hasData) {
-                // Tránh lỗi null dataset nếu chưa có ai nạp
-                // dataset.addValue(0, "Số tiền nạp", "Chưa có dữ liệu");
+                // Avoid null dataset error if no one has topped up
+                // dataset.addValue(0, "Top-up Amount", "No Data");
             }
         }
         return dataset;
     }
 
-    // 4. Cơ cấu Doanh thu (Pie Chart)
+    // 4. Revenue Structure (Pie Chart)
     public DefaultPieDataset<String> getRevenueStructure() throws SQLException {
         DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
 
@@ -105,18 +105,18 @@ public class StatisticsDAO {
                 double serviceRev = rs.getDouble("service_revenue");
                 double topupRev = rs.getDouble("topup_revenue");
 
-                dataset.setValue("Dịch vụ (Đồ ăn/Uống)", serviceRev);
-                dataset.setValue("Giờ chơi (Nạp tiền)", topupRev);
+                dataset.setValue("Services (Food/Drink)", serviceRev);
+                dataset.setValue("Gaming Time (Top-up)", topupRev);
 
                 if (serviceRev == 0 && topupRev == 0) {
-                    dataset.setValue("Chưa có dữ liệu", 1);
+                    dataset.setValue("No Data", 1);
                 }
             }
         }
         return dataset;
     }
 
-    // 5. Tỷ lệ sản phẩm (Pie Chart phụ - Optional)
+    // 5. Product Category Ratio (Secondary Pie Chart - Optional)
     public DefaultPieDataset<String> getProductCategoryRatio() throws SQLException {
         DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
 
