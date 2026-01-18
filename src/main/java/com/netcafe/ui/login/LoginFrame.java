@@ -138,7 +138,7 @@ public class LoginFrame extends JFrame {
                     com.netcafe.dao.AccountDAO accountDAO = new com.netcafe.dao.AccountDAO();
                     com.netcafe.model.Account account = accountDAO.findByUserId(user.getId()).orElse(null);
                     if (account == null || account.getBalance() <= 0) {
-                        throw new Exception("Xin vui long nap them tien tai quay thu ngan");
+                        throw new Exception("Please top up your balance at the cashier");
                     }
                 }
                 return user;
@@ -152,8 +152,8 @@ public class LoginFrame extends JFrame {
                     // Auto-start session for USER role
                     if (user.getRole() == User.Role.USER) {
                         try {
-                            // For testing/simulation, we force "PC-01"
-                            String machineName = "PC-01";
+                            // For testing/simulation, we force "MAY-01"
+                            String machineName = "MAY-01";
                             // String machineName = java.net.InetAddress.getLocalHost().getHostName();
                             new com.netcafe.service.SessionService().startSession(user.getId(), machineName);
                         } catch (Exception e) {

@@ -139,7 +139,7 @@ public class UserHeaderPanel extends JPanel {
                     return existing;
                 }
                 // Create new session
-                String machineName = "PC-" + String.format("%02d", (int) (Math.random() * 20 + 1));
+                String machineName = "MAY-" + String.format("%02d", (int) (Math.random() * 20 + 1));
                 return sessionService.startSession(user.getId(), machineName);
             }
 
